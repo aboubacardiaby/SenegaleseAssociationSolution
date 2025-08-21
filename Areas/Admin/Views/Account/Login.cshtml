@@ -1,0 +1,198 @@
+@* @model SenegaleseAssociation.Areas.Admin.Models.LoginViewModel *@
+@model SenegaleseAssociation.Areas.Admin.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Admin Login";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+}
+
+<!-- Login Page with Enhanced Styling -->
+<div class="login-page-container">
+    <!-- Background Pattern -->
+    <div class="login-bg-pattern"></div>
+    
+    <!-- Floating Shapes -->
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+    </div>
+
+    <div class="container-fluid h-100">
+        <div class="row h-100 no-gutters">
+            <!-- Left Side - Branding -->
+            <div class="col-lg-6 d-none d-lg-flex login-branding-side">
+                <div class="branding-content">
+                    <div class="branding-header slide-in-left">
+                        <div class="logo-container">
+                            <div class="logo-circle">
+                                <i class="fas fa-star-and-crescent"></i>
+                            </div>
+                        </div>
+                        <h1 class="branding-title">Senegalese Association</h1>
+                        <h2 class="branding-subtitle">of Minnesota</h2>
+                        <p class="branding-description">Building bridges, preserving heritage, empowering community</p>
+                    </div>
+                    
+                    <div class="features-list slide-in-left">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Community Support</h4>
+                                <p>Connecting families and individuals</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Educational Programs</h4>
+                                <p>Scholarships and mentorship</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="feature-text">
+                                <h4>Cultural Heritage</h4>
+                                <p>Preserving traditions and values</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-container slide-in-left">
+                        <div class="stat-item">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Community Members</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">15</div>
+                            <div class="stat-label">Years of Service</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">50+</div>
+                            <div class="stat-label">Annual Events</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Login Form -->
+            <div class="col-lg-6 col-12 login-form-side">
+                <div class="login-form-container">
+                    <div class="login-card slide-in-right">
+                        <!-- Header -->
+                        <div class="login-header">
+                            <div class="login-logo d-lg-none">
+                                <div class="logo-circle-small">
+                                    <i class="fas fa-star-and-crescent"></i>
+                                </div>
+                                <span class="logo-text">SAM Admin</span>
+                            </div>
+                            <h2 class="login-title">Welcome Back</h2>
+                            <p class="login-subtitle">Sign in to your admin account</p>
+                        </div>
+
+                        <!-- Login Form -->
+                        <form asp-area="Admin" asp-controller="Account" asp-action="Login" method="post" class="login-form" id="loginForm">
+                           @Html.AntiForgeryToken() 
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger alert-modern" role="alert"></div>
+                            
+                            <!-- Email Field -->
+                            <div class="form-group">
+                                <label asp-for="Email" class="form-label">Email Address</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <input asp-for="Email" class="form-control form-control-modern" 
+                                           placeholder="Enter your email address" autocomplete="email" />
+                                </div>
+                                <span asp-validation-for="Email" class="field-validation-error"></span>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-group">
+                                <label asp-for="Password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                    <input asp-for="Password" type="password" class="form-control form-control-modern" 
+                                           placeholder="Enter your password" autocomplete="current-password" />
+                                    <div class="password-toggle" onclick="togglePassword()">
+                                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="Password" class="field-validation-error"></span>
+                            </div>
+
+                            <!-- Remember Me -->
+                            <div class="form-group form-check-modern">
+                                <input asp-for="RememberMe" type="checkbox" class="form-check-input" id="rememberMe" />
+                                <label asp-for="RememberMe" class="form-check-label" for="rememberMe">
+                                    Keep me signed in
+                                </label>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-login" id="loginBtn">
+                                    Sign In
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Footer -->
+                        <div class="login-footer">
+                            <div class="back-to-website">
+                                <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-arrow-left"></i> Back to Website
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Demo Accounts -->
+                    <div class="demo-accounts slide-in-up">
+                        <div class="demo-header">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Demo Accounts</span>
+                        </div>
+                        <div class="demo-list">
+                            <div class="demo-account" onclick="fillCredentials('admin@samn.org', 'Admin123!')">
+                                <div class="demo-role">Admin</div>
+                                <div class="demo-creds">admin@samn.org</div>
+                            </div>
+                            <div class="demo-account" onclick="fillCredentials('finance@samn.org', 'Finance123!')">
+                                <div class="demo-role">Finance</div>
+                                <div class="demo-creds">finance@samn.org</div>
+                            </div>
+                            <div class="demo-account" onclick="fillCredentials('organization@samn.org', 'Org123!')">
+                                <div class="demo-role">Organization</div>
+                                <div class="demo-creds">organization@samn.org</div>
+                            </div>
+                        </div>
+                        <small class="demo-note">Click on any account to auto-fill credentials</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/login-simple.js" asp-append-version="true"></script>
+}

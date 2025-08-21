@@ -1,0 +1,358 @@
+@model SenegaleseAssociation.Areas.Admin.Models.FinanceReportsViewModel
+@{
+    ViewData["Title"] = "Financial Reports";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-chart-bar text-info"></i> Financial Reports
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-calendar-alt"></i> This Month
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-calendar"></i> Last 6 Months
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-calendar-year"></i> This Year
+            </button>
+        </div>
+        <button type="button" class="btn btn-sm btn-success">
+            <i class="fas fa-download"></i> Export Report
+        </button>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-lg-6 col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-line"></i> Income vs Expenses Trend
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="financialChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-pie-chart"></i> Expense Categories
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="donationsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Breakdown -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-table"></i> Monthly Performance Summary
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Month</th>
+                                <th>Income</th>
+                                <th>Expenses</th>
+                                <th>Net Income</th>
+                                <th>Growth</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.MonthLabels.Count; i++)
+                            {
+                                var income = Model.MonthlyIncomeData[i];
+                                var expense = Model.MonthlyExpenseData[i];
+                                var net = income - expense;
+                                var growth = i > 0 ? ((net - (Model.MonthlyIncomeData[i-1] - Model.MonthlyExpenseData[i-1])) / (Model.MonthlyIncomeData[i-1] - Model.MonthlyExpenseData[i-1]) * 100) : 0;
+                                
+                                <tr class="fade-in">
+                                    <td class="fw-bold">@Model.MonthLabels[i] 2024</td>
+                                    <td class="text-success fw-bold">$@income.ToString("N0")</td>
+                                    <td class="text-danger">$@expense.ToString("N0")</td>
+                                    <td class="@(net >= 0 ? "text-success" : "text-danger") fw-bold">
+                                        $@net.ToString("N0")
+                                    </td>
+                                    <td class="@(growth >= 0 ? "text-success" : "text-danger")">
+                                        @if (i == 0)
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-arrow-@(growth >= 0 ? "up" : "down")"></i>
+                                            @(Math.Abs(growth).ToString("F1"))@Html.Raw("%")
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-secondary">
+                            <tr>
+                                <td class="fw-bold">Total</td>
+                                <td class="text-success fw-bold">$@Model.MonthlyIncomeData.Sum().ToString("N0")</td>
+                                <td class="text-danger fw-bold">$@Model.MonthlyExpenseData.Sum().ToString("N0")</td>
+                                <td class="@((Model.MonthlyIncomeData.Sum() - Model.MonthlyExpenseData.Sum()) >= 0 ? "text-success" : "text-danger") fw-bold">
+                                    $@((Model.MonthlyIncomeData.Sum() - Model.MonthlyExpenseData.Sum()).ToString("N0"))
+                                </td>
+                                <td class="text-muted">-</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Key Metrics -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-calculator"></i> Key Metrics
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-0">
+                    <div class="col-12 mb-3">
+                        <div class="border-left-success p-3 bg-light">
+                            <div class="text-success text-uppercase fw-bold small">Total Revenue</div>
+                            <div class="h4 mb-0 text-gray-800">$@Model.MonthlyIncomeData.Sum().ToString("N0")</div>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <div class="border-left-danger p-3 bg-light">
+                            <div class="text-danger text-uppercase fw-bold small">Total Expenses</div>
+                            <div class="h4 mb-0 text-gray-800">$@Model.MonthlyExpenseData.Sum().ToString("N0")</div>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <div class="border-left-info p-3 bg-light">
+                            <div class="text-info text-uppercase fw-bold small">Profit Margin</div>
+                            <div class="h4 mb-0 text-gray-800">
+                                @{
+                                    var margin = Model.MonthlyIncomeData.Sum() > 0 ? 
+                                        ((Model.MonthlyIncomeData.Sum() - Model.MonthlyExpenseData.Sum()) / Model.MonthlyIncomeData.Sum() * 100) : 0;
+                                }
+                                @(margin.ToString("F1"))@Html.Raw("%")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="border-left-warning p-3 bg-light">
+                            <div class="text-warning text-uppercase fw-bold small">Avg Monthly Income</div>
+                            <div class="h4 mb-0 text-gray-800">$@Model.MonthlyIncomeData.Average().ToString("N0")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Category Breakdown -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-tags"></i> Expense Categories
+                </h6>
+            </div>
+            <div class="card-body">
+                @foreach (var category in Model.CategoryBreakdown.OrderByDescending(c => c.Value))
+                {
+                    var percentage = (category.Value / Model.CategoryBreakdown.Values.Sum()) * 100;
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold small text-gray-800">@category.Key</span>
+                            <span class="small text-muted">$@category.Value.ToString("N0")</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="width: @percentage%" 
+                                 aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-muted">@(percentage.ToString("F1"))@Html.Raw("%") of total</small>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-download"></i> Export Options
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-grid">
+                            <button class="btn btn-outline-success mb-2">
+                                <i class="fas fa-file-excel"></i> Export to Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-grid">
+                            <button class="btn btn-outline-danger mb-2">
+                                <i class="fas fa-file-pdf"></i> Generate PDF Report
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-grid">
+                            <button class="btn btn-outline-info mb-2">
+                                <i class="fas fa-envelope"></i> Email Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Financial Trend Chart
+            const financialCtx = document.getElementById('financialChart').getContext('2d');
+            new Chart(financialCtx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthLabels)),
+                    datasets: [{
+                        label: 'Income',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyIncomeData)),
+                        borderColor: '#00A86B',
+                        backgroundColor: 'rgba(0, 168, 107, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Expenses',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyExpenseData)),
+                        borderColor: '#e74a3b',
+                        backgroundColor: 'rgba(231, 74, 59, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Monthly Financial Performance'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+
+            // Category Breakdown Chart
+            const categoryCtx = document.getElementById('donationsChart').getContext('2d');
+            const categoryLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryBreakdown.Keys));
+            const categoryData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryBreakdown.Values));
+            
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        data: categoryData,
+                        backgroundColor: [
+                            '#00A86B',
+                            '#4e73df',
+                            '#f6c23e',
+                            '#e74a3b',
+                            '#36b9cc',
+                            '#858796'
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Expense Distribution'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Add smooth animations for progress bars
+            $('.progress-bar').each(function() {
+                const $bar = $(this);
+                const width = $bar.css('width');
+                $bar.css('width', '0');
+                setTimeout(() => {
+                    $bar.animate({ width: width }, 1000);
+                }, 500);
+            });
+        });
+    </script>
+}

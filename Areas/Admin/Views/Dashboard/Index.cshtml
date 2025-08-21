@@ -1,0 +1,205 @@
+@model SenegaleseAssociation.Areas.Admin.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-tachometer-alt text-success"></i> Dashboard
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <small class="text-muted">Welcome back, @User.Identity?.Name</small>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+        <div class="card border-left-primary stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Total active events in the system">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Total Events</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@Model.TotalEvents</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+        <div class="card border-left-success stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Events scheduled for the future">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Upcoming</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@Model.UpcomingEvents</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+        <div class="card border-left-info stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Available community services">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Services</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@Model.TotalServices</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-handshake fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+        <div class="card border-left-warning stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Active leadership members">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Leadership</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@Model.TotalLeadership</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+        <div class="card border-left-secondary stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Community testimonials">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Testimonials</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@Model.TotalTestimonials</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-star fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
+        <div class="card border-left-danger stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Unread contact messages">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">New Messages</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@Model.UnreadMessages</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-envelope fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Events -->
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-calendar-alt"></i> Upcoming Events
+                </h6>
+                @if (User.IsInRole("Admin") || User.IsInRole("Organization"))
+                {
+                    <a asp-area="Admin" asp-controller="Events" asp-action="Index" class="btn btn-sm btn-primary">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                }
+            </div>
+            <div class="card-body">
+                @if (Model.RecentEvents.Any())
+                {
+                    @foreach (var evt in Model.RecentEvents)
+                    {
+                        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary text-white rounded text-center p-2" style="width: 50px;">
+                                    <div class="small">@evt.Date.ToString("MMM")</div>
+                                    <div class="h6 mb-0">@evt.Date.Day</div>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">@evt.Title</h6>
+                                <p class="mb-1 text-muted small">@evt.Description</p>
+                                <small class="text-success">
+                                    <i class="fas fa-clock"></i> @evt.Time | 
+                                    <i class="fas fa-map-marker-alt"></i> @evt.Location
+                                </small>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center py-3">No upcoming events scheduled.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Messages -->
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-comments"></i> Recent Messages
+                </h6>
+                @if (User.IsInRole("Admin") || User.IsInRole("Organization"))
+                {
+                    <a asp-area="Admin" asp-controller="ContactMessages" asp-action="Index" class="btn btn-sm btn-primary">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                }
+            </div>
+            <div class="card-body">
+                @if (Model.RecentMessages.Any())
+                {
+                    @foreach (var message in Model.RecentMessages)
+                    {
+                        <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                            <div class="flex-shrink-0">
+                                <div class="@(message.IsRead ? "bg-secondary" : "bg-success") text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6 class="mb-1">@message.Name</h6>
+                                    <small class="text-muted">@message.CreatedAt.ToString("MM/dd/yyyy")</small>
+                                </div>
+                                <p class="mb-1 fw-bold small">@message.Subject</p>
+                                <p class="mb-0 text-muted small">@(message.Message.Length > 80 ? message.Message.Substring(0, 80) + "..." : message.Message)</p>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center py-3">No messages received yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

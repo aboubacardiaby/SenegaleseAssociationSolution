@@ -1,0 +1,78 @@
+@model SenegaleseAssociation.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Edit User";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-user-edit text-primary"></i> Edit User
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">User Information</h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" value="@Model.FirstName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" value="@Model.LastName" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" value="@Model.Email" readonly>
+                        <div class="form-text">Email cannot be changed after user creation.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Roles</label>
+                        <div class="row">
+                            @foreach (var role in ViewBag.Roles)
+                            {
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="roles" value="@role.Name" 
+                                               id="role_@role.Id" @(ViewBag.UserRoles.Contains(role.Name) ? "checked" : "")>
+                                        <label class="form-check-label" for="role_@role.Id">
+                                            @role.Name
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

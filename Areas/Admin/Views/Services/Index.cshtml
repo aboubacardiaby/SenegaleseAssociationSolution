@@ -1,0 +1,66 @@
+@model IEnumerable<SenegaleseAssociation.Models.Service>
+@{
+    ViewData["Title"] = "Services Management";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-handshake text-primary"></i> Services Management
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Service
+        </a>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped data-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Title</td>
+                                <td>@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger btn-delete" 
+                                                data-item-name="@item.Title">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No services found</h5>
+                <p class="text-muted">Start by adding your first service.</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Service
+                </a>
+            </div>
+        }
+    </div>
+</div>

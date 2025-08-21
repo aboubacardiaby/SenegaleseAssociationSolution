@@ -1,0 +1,229 @@
+@{
+    ViewData["Title"] = "About Us";
+}
+
+<section class="hero-small">
+    <div class="container">
+        <h1>About Our Association</h1>
+        <p class="hero-subtitle">Learn more about the Senegalese Association of Minnesota and our mission to serve our community.</p>
+    </div>
+</section>
+
+<section class="about-detailed">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-content">
+                <h2>Our Story</h2>
+                <p>The Senegalese Association of Minnesota was founded with a vision to create a strong, supportive community for Senegalese immigrants and their families in the Twin Cities area. Since our establishment, we have been dedicated to preserving our rich cultural heritage while helping our members successfully integrate into American society.</p>
+                
+                <p>Our association serves as a bridge between our homeland traditions and our new American experience, ensuring that future generations remain connected to their Senegalese roots while embracing the opportunities that Minnesota offers.</p>
+
+                <h3>Our Mission</h3>
+                <p>To foster unity among Senegalese Americans, promote cultural exchange, and contribute positively to the broader Minnesota community through education, social services, and cultural preservation.</p>
+
+                <h3>Our Vision</h3>
+                <p>A thriving Senegalese-American community in Minnesota that maintains its cultural identity while fully participating in and contributing to American society.</p>
+            </div>
+            
+            <div class="about-sidebar">
+                <div class="values-card">
+                    <h3>Our Core Values</h3>
+                    <div class="value-item">
+                        <h4>Teranga</h4>
+                        <p>Hospitality and warmth - the cornerstone of Senegalese culture</p>
+                    </div>
+                    <div class="value-item">
+                        <h4>Jëf</h4>
+                        <p>Honor and dignity in all our interactions and endeavors</p>
+                    </div>
+                    <div class="value-item">
+                        <h4>Ndey Djirim</h4>
+                        <p>Community support and collective responsibility</p>
+                    </div>
+                    <div class="value-item">
+                        <h4>Xam-Xam</h4>
+                        <p>Knowledge and education for continuous growth</p>
+                    </div>
+                </div>
+
+                <div class="stats-card">
+                    <h3>Our Impact</h3>
+                    <div class="stat-item">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Community Members</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Events Annually</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">15</span>
+                        <span class="stat-label">Years of Service</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Families Supported</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="leadership">
+    <div class="container">
+        <h2>Leadership Team</h2>
+        <div class="leadership-grid">
+            <div class="leader-card">
+                <div class="leader-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="leader-info">
+                    <h3>President</h3>
+                    <p>Leading our community with vision and dedication to preserve our cultural heritage while embracing American opportunities.</p>
+                </div>
+            </div>
+            
+            <div class="leader-card">
+                <div class="leader-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="leader-info">
+                    <h3>Vice President</h3>
+                    <p>Supporting community initiatives and coordinating cultural programs that keep our traditions alive for future generations.</p>
+                </div>
+            </div>
+            
+            <div class="leader-card">
+                <div class="leader-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="leader-info">
+                    <h3>Secretary</h3>
+                    <p>Maintaining community records and facilitating communication between members and the broader Minnesota community.</p>
+                </div>
+            </div>
+            
+            <div class="leader-card">
+                <div class="leader-image">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="leader-info">
+                    <h3>Treasurer</h3>
+                    <p>Managing community resources and ensuring transparent financial stewardship for all association activities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <style>
+        .hero-small {
+            background: linear-gradient(135deg, #00A86B 0%, #228B22 50%, #FFD700 100%);
+            color: white;
+            padding: 120px 0 60px;
+            text-align: center;
+        }
+        
+        .hero-small h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .about-detailed {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+        
+        .about-content h2, .about-content h3 {
+            color: #00A86B;
+            margin-bottom: 1rem;
+        }
+        
+        .about-content p {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            color: #666;
+        }
+        
+        .values-card, .stats-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .value-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .value-item h4 {
+            color: #00A86B;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00A86B;
+        }
+        
+        .leadership {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .leadership-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .leader-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .leader-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .leader-image i {
+            font-size: 4rem;
+            color: #00A86B;
+            margin-bottom: 1rem;
+        }
+        
+        .leader-info h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .leader-info p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+}

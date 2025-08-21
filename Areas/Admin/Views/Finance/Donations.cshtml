@@ -1,0 +1,288 @@
+@model List<SenegaleseAssociation.Areas.Admin.Models.DonationViewModel>
+@{
+    ViewData["Title"] = "Donations Management";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-heart text-success"></i> Donations Management
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-download"></i> Export
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-left-success stats-card shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Total Raised</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">$@Model.Sum(d => d.Amount).ToString("N0")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-left-primary stats-card shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Total Donors</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@Model.Count</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-left-warning stats-card shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Pending</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@Model.Count(d => d.Status == "Pending")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card border-left-info stats-card shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Average</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">$@(Model.Any() ? Model.Average(d => d.Amount).ToString("N0") : "0")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-bar fa-2x text-white opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Donations Table -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-list"></i> All Donations
+        </h6>
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">All Donations</a></li>
+                <li><a class="dropdown-item" href="#">Completed Only</a></li>
+                <li><a class="dropdown-item" href="#">Pending Only</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered data-table" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Donor Name</th>
+                        <th>Email</th>
+                        <th>Amount</th>
+                        <th>Purpose</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var donation in Model)
+                    {
+                        <tr class="fade-in searchable-item">
+                            <td class="fw-bold">@donation.DonorName</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(donation.Email))
+                                {
+                                    <a href="mailto:@donation.Email" class="text-decoration-none">
+                                        @donation.Email
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Not provided</span>
+                                }
+                            </td>
+                            <td class="fw-bold text-success">$@donation.Amount.ToString("N2")</td>
+                            <td>
+                                <span class="badge bg-secondary">@donation.Purpose</span>
+                            </td>
+                            <td>@donation.Date.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @if (donation.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check"></i> Completed
+                                    </span>
+                                }
+                                else if (donation.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@donation.Status</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    @if (donation.Status == "Pending")
+                                    {
+                                        <form asp-action="ApproveDonation" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@donation.Id" />
+                                            <button type="submit" class="btn btn-success btn-sm" 
+                                                    data-bs-toggle="tooltip" title="Approve donation">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    <button type="button" class="btn btn-info btn-sm" 
+                                            data-bs-toggle="modal" data-bs-target="#viewModal@(donation.Id)"
+                                            data-bs-toggle="tooltip" title="View details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm btn-delete" 
+                                            data-item-name="@donation.DonorName's donation"
+                                            data-bs-toggle="tooltip" title="Delete donation">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- View Modals -->
+@foreach (var donation in Model)
+{
+    <div class="modal fade" id="viewModal@(donation.Id)" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-heart text-success"></i> Donation Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Donor Information</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Name:</strong></td>
+                                    <td>@donation.DonorName</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>@(string.IsNullOrEmpty(donation.Email) ? "Not provided" : donation.Email)</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Donation Information</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Amount:</strong></td>
+                                    <td class="text-success fw-bold">$@donation.Amount.ToString("N2")</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Purpose:</strong></td>
+                                    <td>@donation.Purpose</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Date:</strong></td>
+                                    <td>@donation.Date.ToString("MMMM dd, yyyy")</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        @if (donation.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">Completed</span>
+                                        }
+                                        else if (donation.Status == "Pending")
+                                        {
+                                            <span class="badge bg-warning">Pending</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@donation.Status</span>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (donation.Status == "Pending")
+                    {
+                        <form asp-action="ApproveDonation" method="post" class="me-2">
+                            <input type="hidden" name="id" value="@donation.Id" />
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Approve Donation
+                            </button>
+                        </form>
+                    }
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Initialize DataTable with custom options
+        $(document).ready(function() {
+            $('.data-table').DataTable({
+                order: [[4, 'desc']], // Sort by date descending
+                columnDefs: [
+                    { orderable: false, targets: [6] }, // Disable sorting for Actions column
+                ],
+                responsive: true,
+                pageLength: 25
+            });
+        });
+    </script>
+}

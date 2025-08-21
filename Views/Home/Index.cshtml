@@ -1,0 +1,645 @@
+@{
+    ViewData["Title"] = "Home";
+    var upcomingEvents = ViewBag.UpcomingEvents as IEnumerable<Event>;
+    var services = ViewBag.Services as IEnumerable<Service>;
+}
+
+<section id="home" class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="hero-badge">
+                <span class="badge-text">🌍 Established 2009</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="title-main">Senegalese Association</span>
+                <span class="title-sub">of Minnesota</span>
+            </h1>
+            <p class="hero-subtitle">Jëf ak Jëf - Unity through Community</p>
+            <p class="hero-description">
+                Building bridges between cultures, preserving our rich Senegalese heritage, and empowering our community through education, support, and cultural celebration in the heart of Minnesota.
+            </p>
+            <div class="hero-buttons">
+                <a asp-controller="Home" asp-action="About" class="btn btn-primary">
+                    <i class="fas fa-heart"></i>
+                    Discover Our Story
+                </a>
+                <a asp-controller="Home" asp-action="Events" class="btn btn-outline">
+                    <i class="fas fa-calendar-alt"></i>
+                    Join Our Events
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Community Members</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15</span>
+                    <span class="stat-label">Years Serving</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Annual Events</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-card">
+                <div class="flag-display">
+                    <div class="flag-colors">
+                        <div class="color green"></div>
+                        <div class="color yellow"></div>
+                        <div class="color red"></div>
+                    </div>
+                </div>
+                <div class="community-showcase">
+                    <div class="showcase-item">
+                        <i class="fas fa-users"></i>
+                        <span>Strong Community</span>
+                    </div>
+                    <div class="showcase-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Education Programs</span>
+                    </div>
+                    <div class="showcase-item">
+                        <i class="fas fa-music"></i>
+                        <span>Cultural Heritage</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-scroll-indicator">
+        <span>Scroll to explore</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+</section>
+
+<section class="president-welcome-section">
+    <div class="container">
+        <div class="president-welcome">
+            <div class="president-content">
+                <div class="president-image-container">
+                    <div class="president-image">
+                        <div class="image-placeholder president-photo">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="president-badge">
+                            <span>President</span>
+                        </div>
+                    </div>
+                    <div class="president-info">
+                        <h3>Aida Sarr Lewis</h3>
+                        <p class="president-title">President, Senegalese Association of Minnesota</p>
+                        <div class="president-credentials">
+                            <div class="credential">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Serving since 2020</span>
+                            </div>
+                            <div class="credential">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>Community Leader</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="welcome-message">
+                    <div class="message-header">
+                        <span class="welcome-badge">Message from the President</span>
+                        <h2>Asalaam Malekum & Welcome to Our Community</h2>
+                    </div>
+                    
+                    <div class="message-content">
+                        <blockquote>
+                            <p>"As President of the Senegalese Association of Minnesota, I am honored to welcome you to our vibrant community family. Since our founding, we have been dedicated to preserving our beautiful Senegalese culture while building bridges in our new home here in Minnesota."</p>
+                            
+                            <p>"Our association represents more than just an organization – we are a <em>family</em> bound by our shared heritage, values, and commitment to supporting one another. Whether you are a recent immigrant seeking guidance or a long-time resident looking to stay connected to your roots, you will find a warm welcome here."</p>
+                            
+                            <p>"We invite you to join us in our mission of <strong>Teranga</strong> (hospitality), <strong>Jëf</strong> (honor), and <strong>Ndey Djirim</strong> (community support). Together, we are building a stronger, more connected Senegalese community in the heart of Minnesota."</p>
+                        </blockquote>
+                        
+                        <div class="message-signature">
+                            <div class="signature-line">
+                                <span class="signature-name">Aida Sarr Lewis</span>
+                                <span class="signature-title">President</span>
+                            </div>
+                            <div class="signature-quote">
+                                <em>"Jëf ak Jëf" - Unity through Community</em>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="president-cta">
+                        <a asp-controller="Home" asp-action="Contact" class="btn btn-primary">
+                            <i class="fas fa-handshake"></i>
+                            Connect With Our Leadership
+                        </a>
+                        <a asp-controller="Home" asp-action="About" class="btn btn-outline">
+                            <i class="fas fa-users"></i>
+                            Meet Our Team
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="president-highlights">
+                <h3>Under President Lewis's Leadership</h3>
+                <div class="highlights-grid">
+                    <div class="highlight-card">
+                        <div class="highlight-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="highlight-content">
+                            <span class="highlight-number">300%</span>
+                            <span class="highlight-label">Membership Growth</span>
+                        </div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="highlight-content">
+                            <span class="highlight-number">50+</span>
+                            <span class="highlight-label">Youth Scholarships</span>
+                        </div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="highlight-content">
+                            <span class="highlight-number">200+</span>
+                            <span class="highlight-label">Families Supported</span>
+                        </div>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="highlight-content">
+                            <span class="highlight-number">75+</span>
+                            <span class="highlight-label">Community Events</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="community-slider-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Community Highlights</span>
+            <h2>Experience Our Vibrant Community</h2>
+            <p class="section-subtitle">Discover the moments that define our Senegalese family in Minnesota</p>
+        </div>
+        
+        <div class="community-slider">
+            <div class="slider-container">
+                <div class="slider-wrapper">
+                    <div class="slide active" data-slide="1">
+                        <div class="slide-content">
+                            <div class="slide-image">
+                                <div class="image-placeholder cultural-event">
+                                    <i class="fas fa-music"></i>
+                                    <span>Cultural Festival 2024</span>
+                                </div>
+                            </div>
+                            <div class="slide-text">
+                                <h3>Annual Cultural Festival</h3>
+                                <p>Our biggest celebration of the year brings together over 800 community members for traditional music, dance, and authentic Senegalese cuisine. Experience the vibrant spirit of our heritage through colorful performances and cultural exhibitions.</p>
+                                <div class="slide-stats">
+                                    <div class="stat">
+                                        <span class="number">800+</span>
+                                        <span class="label">Attendees</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">20</span>
+                                        <span class="label">Performers</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">15</span>
+                                        <span class="label">Food Vendors</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slide" data-slide="2">
+                        <div class="slide-content">
+                            <div class="slide-image">
+                                <div class="image-placeholder education">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Education Excellence</span>
+                                </div>
+                            </div>
+                            <div class="slide-text">
+                                <h3>Youth Education Programs</h3>
+                                <p>Empowering the next generation through comprehensive educational support. Our programs include Wolof language classes, academic tutoring, college preparation, and leadership development workshops for young Senegalese-Americans.</p>
+                                <div class="slide-stats">
+                                    <div class="stat">
+                                        <span class="number">150+</span>
+                                        <span class="label">Students</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">25</span>
+                                        <span class="label">Tutors</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">95%</span>
+                                        <span class="label">Success Rate</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slide" data-slide="3">
+                        <div class="slide-content">
+                            <div class="slide-image">
+                                <div class="image-placeholder community-support">
+                                    <i class="fas fa-hands-helping"></i>
+                                    <span>Community Support</span>
+                                </div>
+                            </div>
+                            <div class="slide-text">
+                                <h3>Integration & Support Services</h3>
+                                <p>We provide comprehensive support to help new immigrants integrate successfully into Minnesota society. From housing assistance to job placement, our dedicated volunteers ensure no family faces challenges alone.</p>
+                                <div class="slide-stats">
+                                    <div class="stat">
+                                        <span class="number">200+</span>
+                                        <span class="label">Families Helped</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">50</span>
+                                        <span class="label">Volunteers</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">24/7</span>
+                                        <span class="label">Support</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slide" data-slide="4">
+                        <div class="slide-content">
+                            <div class="slide-image">
+                                <div class="image-placeholder language-culture">
+                                    <i class="fas fa-language"></i>
+                                    <span>Language & Culture</span>
+                                </div>
+                            </div>
+                            <div class="slide-text">
+                                <h3>Language & Cultural Preservation</h3>
+                                <p>Keeping our Wolof language and traditions alive through engaging classes and cultural workshops. From traditional drumming to storytelling, we ensure our children stay connected to their roots.</p>
+                                <div class="slide-stats">
+                                    <div class="stat">
+                                        <span class="number">12</span>
+                                        <span class="label">Weekly Classes</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">75+</span>
+                                        <span class="label">Students</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">8</span>
+                                        <span class="label">Instructors</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="slide" data-slide="5">
+                        <div class="slide-content">
+                            <div class="slide-image">
+                                <div class="image-placeholder community-gathering">
+                                    <i class="fas fa-users"></i>
+                                    <span>Monthly Gatherings</span>
+                                </div>
+                            </div>
+                            <div class="slide-text">
+                                <h3>Monthly Community Gatherings</h3>
+                                <p>Every month, our community comes together to share updates, celebrate achievements, and strengthen our bonds. These gatherings foster unity and provide a platform for community members to connect and support each other.</p>
+                                <div class="slide-stats">
+                                    <div class="stat">
+                                        <span class="number">12</span>
+                                        <span class="label">Annual Meetings</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">300+</span>
+                                        <span class="label">Regular Attendees</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="number">100%</span>
+                                        <span class="label">Community Focused</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Slider Navigation -->
+                <div class="slider-nav">
+                    <button class="nav-btn prev-btn" aria-label="Previous slide">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="nav-btn next-btn" aria-label="Next slide">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Slider Indicators -->
+                <div class="slider-indicators">
+                    <button class="indicator active" data-slide="1" aria-label="Go to slide 1"></button>
+                    <button class="indicator" data-slide="2" aria-label="Go to slide 2"></button>
+                    <button class="indicator" data-slide="3" aria-label="Go to slide 3"></button>
+                    <button class="indicator" data-slide="4" aria-label="Go to slide 4"></button>
+                    <button class="indicator" data-slide="5" aria-label="Go to slide 5"></button>
+                </div>
+                
+                <!-- Slider Progress Bar -->
+                <div class="slider-progress">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mission-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Our Mission</span>
+            <h2>Preserving Heritage, Building Futures</h2>
+            <p class="section-subtitle">Connecting Senegalese culture with Minnesota community</p>
+        </div>
+        
+        <div class="mission-grid">
+            <div class="mission-content">
+                <div class="mission-story">
+                    <h3>Our Story</h3>
+                    <p>Since 2009, the Senegalese Association of Minnesota has served as the cornerstone of our diaspora community in the Twin Cities. We bridge the gap between our cherished homeland traditions and our American journey, ensuring that our rich cultural heritage thrives for generations to come.</p>
+                    
+                    <div class="impact-highlights">
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="highlight-content">
+                                <h4>Community Hub</h4>
+                                <p>Central gathering place for cultural events and community support</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <div class="highlight-icon">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <div class="highlight-content">
+                                <h4>Integration Support</h4>
+                                <p>Helping families navigate and thrive in American society</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="values-showcase">
+                <h3>Guided by Senegalese Values</h3>
+                <div class="values-grid">
+                    <div class="value-card">
+                        <div class="value-icon">🤝</div>
+                        <h4>Teranga</h4>
+                        <p>Hospitality and warmth that welcomes all</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">⭐</div>
+                        <h4>Jëf</h4>
+                        <p>Honor and dignity in all we do</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">👥</div>
+                        <h4>Ndey Djirim</h4>
+                        <p>Community support and collective care</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">📚</div>
+                        <h4>Xam-Xam</h4>
+                        <p>Knowledge and lifelong learning</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="community" class="services-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Community Services</span>
+            <h2>How We Serve Our Community</h2>
+            <p class="section-subtitle">Comprehensive support for every stage of your journey</p>
+        </div>
+        
+        <div class="services-showcase">
+            @if (services != null)
+            {
+                @foreach (var service in services)
+                {
+                    <div class="service-card-enhanced">
+                        <div class="service-header">
+                            @if (!string.IsNullOrEmpty(service.IconClass))
+                            {
+                                <div class="service-icon-wrapper">
+                                    <i class="@service.IconClass"></i>
+                                </div>
+                            }
+                            <h3>@service.Title</h3>
+                        </div>
+                        <p class="service-description">@service.Description</p>
+                        <div class="service-features">
+                            @switch (service.Title)
+                            {
+                                case "Cultural Programs":
+                                    <ul>
+                                        <li>Wolof language classes</li>
+                                        <li>Traditional dance workshops</li>
+                                        <li>Music and arts programs</li>
+                                    </ul>
+                                    break;
+                                case "Integration Support":
+                                    <ul>
+                                        <li>Immigration assistance</li>
+                                        <li>Job placement services</li>
+                                        <li>Housing resources</li>
+                                    </ul>
+                                    break;
+                                case "Youth Development":
+                                    <ul>
+                                        <li>Educational tutoring</li>
+                                        <li>Leadership programs</li>
+                                        <li>College prep support</li>
+                                    </ul>
+                                    break;
+                                case "Social Services":
+                                    <ul>
+                                        <li>Emergency assistance</li>
+                                        <li>Family counseling</li>
+                                        <li>Elder care support</li>
+                                    </ul>
+                                    break;
+                            }
+                        </div>
+                        <a href="#" class="service-link">
+                            Learn More <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<section class="testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Community Voices</span>
+            <h2>Stories from Our Community</h2>
+            <p class="section-subtitle">Hear from families who have found their home with us</p>
+        </div>
+        
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"The Senegalese Association became our second family when we moved to Minnesota. They helped us navigate everything from finding housing to enrolling our children in school."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="author-info">
+                        <h4>Fatou Diallo</h4>
+                        <span>Community Member since 2015</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"Through the cultural programs, my children are learning Wolof and staying connected to their roots while excelling in American schools."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="author-info">
+                        <h4>Mamadou Seck</h4>
+                        <span>Parent and Volunteer</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"The youth leadership program gave me confidence and skills that helped me get into college and pursue my dreams."</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="author-info">
+                        <h4>Aminata Ba</h4>
+                        <span>College Student</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="events" class="events-preview">
+    <div class="container">
+        <div class="events-header">
+            <div class="events-intro">
+                <span class="section-badge">Community Calendar</span>
+                <h2>Join Our Upcoming Events</h2>
+                <p>Experience the vibrant spirit of our community through cultural celebrations, educational programs, and social gatherings.</p>
+            </div>
+            <a asp-controller="Home" asp-action="Events" class="btn btn-outline">
+                View All Events <i class="fas fa-calendar"></i>
+            </a>
+        </div>
+        
+        <div class="events-showcase">
+            @if (upcomingEvents != null)
+            {
+                @foreach (var eventItem in upcomingEvents)
+                {
+                    <div class="event-card-preview">
+                        <div class="event-visual">
+                            <div class="event-date-badge">
+                                <span class="day">@eventItem.Date.Day</span>
+                                <span class="month">@eventItem.Date.ToString("MMM")</span>
+                            </div>
+                            <div class="event-category">
+                                <i class="fas fa-users"></i>
+                                <span>Community</span>
+                            </div>
+                        </div>
+                        <div class="event-content">
+                            <h3>@eventItem.Title</h3>
+                            <p>@eventItem.Description</p>
+                            <div class="event-meta">
+                                <span class="event-time">
+                                    <i class="fas fa-clock"></i>
+                                    @eventItem.Time
+                                </span>
+                                @if (!string.IsNullOrEmpty(eventItem.Location))
+                                {
+                                    <span class="event-location">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        @eventItem.Location
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn-event-interest">
+                                <i class="fas fa-heart"></i>
+                                Interested
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <div class="cta-text">
+                <h2>Ready to Join Our Community?</h2>
+                <p>Whether you're new to Minnesota or have been here for years, there's a place for you in our Senegalese family. Get involved, make connections, and help us continue building a stronger community together.</p>
+            </div>
+            <div class="cta-actions">
+                <a asp-controller="Home" asp-action="Contact" class="btn btn-primary btn-lg">
+                    <i class="fas fa-envelope"></i>
+                    Get In Touch
+                </a>
+                <a asp-controller="Home" asp-action="Events" class="btn btn-outline btn-lg">
+                    <i class="fas fa-calendar-plus"></i>
+                    Attend an Event
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

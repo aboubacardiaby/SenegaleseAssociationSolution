@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Senegalese Association of Minnesota</title>
+    <link rel="stylesheet" href="~/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <h1>@Html.ActionLink("Senegalese Association of Minnesota", "Index", "Home", null, new { @style = "color: white; text-decoration: none;" })</h1>
+                    <p class="tagline">Jëf ak Jëf - Unity through Community</p>
+                </div>
+                <ul class="nav-menu">
+                    <li><a asp-controller="Home" asp-action="Index" class="nav-link">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
+                    <li><a href="#community" class="nav-link">Community</a></li>
+                    <li><a asp-controller="Home" asp-action="Events" class="nav-link">Events</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+        
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
+        
+        @RenderBody()
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Senegalese Association of Minnesota</h3>
+                    <p>Strengthening our community through unity, culture, and mutual support.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a asp-controller="Home" asp-action="About">About Us</a></li>
+                        <li><a href="#community">Services</a></li>
+                        <li><a asp-controller="Home" asp-action="Events">Events</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect With Us</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Facebook</a>
+                        <a href="#" class="social-link">Instagram</a>
+                        <a href="#" class="social-link">Twitter</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; @DateTime.Now.Year Senegalese Association of Minnesota. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Fix for deprecated unload event warnings -->
+    <script src="~/js/fix-unload-warnings.js"></script>
+    <script src="~/js/script.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
