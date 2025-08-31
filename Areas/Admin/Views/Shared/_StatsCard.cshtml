@@ -1,0 +1,147 @@
+﻿@model dynamic
+
+@{
+    var title = (string)Model.Title;
+    var value = (int)Model.Value;
+    var icon = (string)Model.Icon;
+    var borderClass = (string)Model.BorderClass;
+    var tooltip = (string)Model.Tooltip;
+    var animationDelay = Model.AnimationDelay != null ? (double)Model.AnimationDelay : 0;
+}
+
+<div class="card @borderClass stats-card shadow h-100 py-2"
+     data-bs-toggle="tooltip"
+     title="@tooltip"
+     style="animation-delay: @(animationDelay)s;"
+     role="button"
+     tabindex="0"
+     aria-describedby="stats-@title.Replace(" ", "-").ToLower()">
+
+    <div class="card-body">
+        <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-white text-uppercase mb-1"
+                     id="stats-@title.Replace(" ", "-").ToLower()">
+                    @title
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-white"
+                     aria-label="@title count: @value">
+                    @value.ToString("N0")
+                </div>
+            </div>
+            <div class="col-auto">
+                <i class="@icon fa-2x text-white opacity-50" aria-hidden="true"></i>
+            </div>
+        </div>
+    </div>
+
+    @* Add a subtle loading indicator for real-time updates *@
+    <div class="card-footer bg-transparent border-0 p-0">
+        <div class="progress" style="height: 2px; opacity: 0;" id="progress-@title.Replace(" ", "-").ToLower()">
+            <div class="progress-bar bg-white" role="progressbar" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
+
+@* Add CSS for enhanced interactivity *@
+<style>
+    .stats-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .stats-card:focus {
+            outline: 2px solid rgba(255, 255, 255, 0.8);
+            outline-offset: 2px;
+        }
+
+        .stats-card:active {
+            transform: translateY(-1px) scale(1.01);
+        }
+
+        .stats-card .progress-bar {
+            transition: width 0.5s ease;
+        }
+
+        .stats-card.updating .progress {
+            opacity: 1 !important;
+        }
+
+        .stats-card.updating .progress-bar {
+            width: 100% !important;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+    @@keyframes pulse {
+        0%, 100%
+
+    {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    }
+</style>
+
+@* Add JavaScript for enhanced functionality *@
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statsCard = document.querySelector('.stats-card[aria-describedby="stats-@title.Replace(" ", "-").ToLower()"]');
+
+        if (statsCard) {
+            // Add keyboard navigation
+            statsCard.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    statsCard.click();
+                }
+            });
+
+            // Add ripple effect on click
+            statsCard.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = statsCard.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+
+                statsCard.style.position = 'relative';
+                statsCard.style.overflow = 'hidden';
+                statsCard.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        }
+    });
+</script>
+
+@* Add ripple animation CSS *@
+<style>
+    @@keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+</style>

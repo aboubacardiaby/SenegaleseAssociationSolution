@@ -1,0 +1,311 @@
+@model SenegaleseAssociation.Models.Member
+@{
+    ViewData["Title"] = "Member Details";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-user text-primary"></i> Member Details
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Index" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Personal Information</h6>
+                @switch (Model.MembershipStatus)
+                {
+                    case "Pending":
+                        <span class="badge bg-warning fs-6">Pending Approval</span>
+                        break;
+                    case "Active":
+                        <span class="badge bg-success fs-6">Active Member</span>
+                        break;
+                    case "Suspended":
+                        <span class="badge bg-danger fs-6">Suspended</span>
+                        break;
+                    case "Rejected":
+                        <span class="badge bg-secondary fs-6">Rejected</span>
+                        break;
+                }
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Full Name:</strong></div>
+                    <div class="col-sm-9">@Model.FullName</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Email:</strong></div>
+                    <div class="col-sm-9">
+                        <a href="mailto:@Model.Email">@Model.Email</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Phone:</strong></div>
+                    <div class="col-sm-9">
+                        <a href="tel:@Model.PhoneNumber">@Model.PhoneNumber</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Date of Birth:</strong></div>
+                    <div class="col-sm-9">@Model.DateOfBirth.ToString("MMMM dd, yyyy")</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Gender:</strong></div>
+                    <div class="col-sm-9">@Model.Gender</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Profession:</strong></div>
+                    <div class="col-sm-9">@(!string.IsNullOrEmpty(Model.Profession) ? Model.Profession : "Not specified")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow mt-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Address Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Address:</strong></div>
+                    <div class="col-sm-9">@(!string.IsNullOrEmpty(Model.Address) ? Model.Address : "Not provided")</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>City:</strong></div>
+                    <div class="col-sm-9">@(!string.IsNullOrEmpty(Model.City) ? Model.City : "Not provided")</div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.State))
+                {
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>State:</strong></div>
+                        <div class="col-sm-9">@Model.State</div>
+                    </div>
+                }
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Postal Code:</strong></div>
+                    <div class="col-sm-9">@(!string.IsNullOrEmpty(Model.PostalCode) ? Model.PostalCode : "Not provided")</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Country:</strong></div>
+                    <div class="col-sm-9">@(!string.IsNullOrEmpty(Model.Country) ? Model.Country : "Not provided")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow mt-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Emergency Contact</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Contact Name:</strong></div>
+                    <div class="col-sm-9">@(!string.IsNullOrEmpty(Model.EmergencyContactName) ? Model.EmergencyContactName : "Not provided")</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Contact Phone:</strong></div>
+                    <div class="col-sm-9">
+                        @if (!string.IsNullOrEmpty(Model.EmergencyContactPhone))
+                        {
+                            <a href="tel:@Model.EmergencyContactPhone">@Model.EmergencyContactPhone</a>
+                        }
+                        else
+                        {
+                            <span>Not provided</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Notes))
+        {
+            <div class="card shadow mt-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Notes</h6>
+                </div>
+                <div class="card-body">
+                    <pre class="mb-0">@Model.Notes</pre>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Membership Status</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="bg-primary text-white rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                    <h5>@Model.FullName</h5>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <strong>Registration Date:</strong><br>
+                    <small class="text-muted">@Model.RegistrationDate.ToString("MMMM dd, yyyy 'at' h:mm tt")</small>
+                </div>
+
+                @if (Model.ApprovedDate.HasValue)
+                {
+                    <div class="mb-3">
+                        <strong>Approved Date:</strong><br>
+                        <small class="text-muted">@Model.ApprovedDate.Value.ToString("MMMM dd, yyyy 'at' h:mm tt")</small>
+                    </div>
+                }
+
+                @if (Model.ApprovedBy != null)
+                {
+                    <div class="mb-3">
+                        <strong>Approved By:</strong><br>
+                        <small class="text-muted">@Model.ApprovedBy.FullName</small>
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <strong>Status:</strong><br>
+                    @switch (Model.MembershipStatus)
+                    {
+                        case "Pending":
+                            <span class="badge bg-warning">Pending Approval</span>
+                            break;
+                        case "Active":
+                            <span class="badge bg-success">Active Member</span>
+                            break;
+                        case "Suspended":
+                            <span class="badge bg-danger">Suspended</span>
+                            break;
+                        case "Rejected":
+                            <span class="badge bg-secondary">Rejected</span>
+                            break;
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <strong>Account Status:</strong><br>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactive</span>
+                    }
+                </div>
+
+                <hr>
+
+                <!-- Action Buttons -->
+                @if (Model.MembershipStatus == "Pending")
+                {
+                    <div class="d-grid gap-2">
+                        <form asp-action="Approve" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Are you sure you want to approve this member?')">
+                                <i class="fas fa-check"></i> Approve Member
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-danger" onclick="showRejectForm()">
+                            <i class="fas fa-times"></i> Reject Application
+                        </button>
+                    </div>
+                }
+                else if (Model.MembershipStatus == "Active")
+                {
+                    <button type="button" class="btn btn-warning w-100" onclick="showSuspendForm()">
+                        <i class="fas fa-pause"></i> Suspend Member
+                    </button>
+                }
+                else if (Model.MembershipStatus == "Suspended" || Model.MembershipStatus == "Rejected")
+                {
+                    <form asp-action="Reactivate" method="post" class="d-grid">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to reactivate this member?')">
+                            <i class="fas fa-play"></i> Reactivate Member
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Form Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Reject" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Member Application</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to reject <strong>@Model.FullName</strong>'s membership application?</p>
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Reason (optional):</label>
+                        <textarea name="reason" class="form-control" rows="3" placeholder="Enter reason for rejection..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Reject Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Suspend Form Modal -->
+<div class="modal fade" id="suspendModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Suspend" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Suspend Member</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to suspend <strong>@Model.FullName</strong>'s membership?</p>
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Reason (optional):</label>
+                        <textarea name="reason" class="form-control" rows="3" placeholder="Enter reason for suspension..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Suspend Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showRejectForm() {
+            const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+            modal.show();
+        }
+
+        function showSuspendForm() {
+            const modal = new bootstrap.Modal(document.getElementById('suspendModal'));
+            modal.show();
+        }
+    </script>
+}

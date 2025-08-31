@@ -1,0 +1,88 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Our Members";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main id="main" style="padding-top: 100px;">
+    <section class="container">
+        <div class="hero-content" style="text-align: center; margin-bottom: 60px;">
+            <h1 style="font-size: 3rem; font-weight: 700; color: #00A86B; margin-bottom: 20px;">Our Community Members</h1>
+            <p style="font-size: 1.2rem; color: #666; max-width: 600px; margin: 0 auto 30px;">Meet the amazing people who make up our vibrant Senegalese community in Minnesota.</p>
+            <div>
+                <a href="@Url.Action("Register")" class="btn btn-primary btn-lg" style="padding: 15px 30px; font-size: 1.1rem;">
+                    <i class="fas fa-user-plus"></i> Join Our Community
+                </a>
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+                @foreach (var member in Model)
+                {
+                    <div class="member-card" style="background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); padding: 30px; text-align: center; transition: all 0.3s ease;">
+                        <div style="margin-bottom: 20px;">
+                            <div style="background: linear-gradient(135deg, #00A86B, #228B22); color: white; border-radius: 50%; width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-user" style="font-size: 1.8rem;"></i>
+                            </div>
+                        </div>
+                        <h3 style="color: #00A86B; margin-bottom: 15px; font-size: 1.3rem; font-weight: 600;">@member.FirstName @member.LastName</h3>
+                        @if (!string.IsNullOrEmpty(member.Profession))
+                        {
+                            <p style="color: #666; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-briefcase" style="color: #00A86B;"></i> @member.Profession
+                            </p>
+                        }
+                        @if (!string.IsNullOrEmpty(member.City) || !string.IsNullOrEmpty(member.State) || !string.IsNullOrEmpty(member.Country))
+                        {
+                            <p style="color: #666; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-map-marker-alt" style="color: #00A86B;"></i> 
+                                @{
+                                    var locationParts = new List<string>();
+                                    if (!string.IsNullOrEmpty(member.City)) locationParts.Add(member.City);
+                                    if (!string.IsNullOrEmpty(member.State)) locationParts.Add(member.State);
+                                    if (!string.IsNullOrEmpty(member.Country)) locationParts.Add(member.Country);
+                                }
+                                @string.Join(", ", locationParts)
+                            </p>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div style="text-align: center; padding: 80px 0;">
+                <i class="fas fa-users" style="font-size: 5rem; color: #ccc; margin-bottom: 30px;"></i>
+                <h3 style="color: #666; margin-bottom: 15px; font-size: 1.8rem;">No members to display</h3>
+                <p style="color: #999; margin-bottom: 30px; font-size: 1.1rem;">Be the first to join our community!</p>
+                <a href="@Url.Action("Register")" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus"></i> Join Now
+                </a>
+            </div>
+        }
+    </section>
+</main>
+
+<style>
+    .member-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 168, 107, 0.15) !important;
+        transform: translateY(-5px);
+    }
+
+    @@media (max-width: 768px) {
+        .container {
+            padding: 0 20px;
+        }
+        div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+        .hero-content h1 {
+            font-size: 2.5rem !important;
+        }
+        .hero-content p {
+            font-size: 1.1rem !important;
+        }
+    }
+</style>

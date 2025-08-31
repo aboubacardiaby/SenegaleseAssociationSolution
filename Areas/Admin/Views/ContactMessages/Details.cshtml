@@ -1,0 +1,172 @@
+@model SenegaleseAssociation.Models.ContactMessage
+@{
+    ViewData["Title"] = "Contact Message Details";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-envelope-open text-primary"></i> Contact Message Details
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Index" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Back to Messages
+        </a>
+        @if (!Model.IsRead)
+        {
+            <form asp-action="MarkAsRead" asp-route-id="@Model.Id" method="post" class="d-inline me-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check"></i> Mark as Read
+                </button>
+            </form>
+        }
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+            <button type="submit" class="btn btn-danger btn-delete" data-item-name="message from @Model.Name">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Message Content</h6>
+                <span class="badge @(Model.IsRead ? "bg-secondary" : "bg-success") fs-6">
+                    @(Model.IsRead ? "Read" : "New")
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5 class="text-primary mb-3">@Model.Subject</h5>
+                    <div class="message-content" style="white-space: pre-wrap; line-height: 1.6; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;">
+                        @Model.Message
+                    </div>
+                </div>
+                
+                @if (!string.IsNullOrEmpty(Model.Message))
+                {
+                    <div class="mt-4">
+                        <h6 class="text-muted">Quick Actions</h6>
+                        <div class="btn-group" role="group">
+                            <a href="mailto:@Model.Email?subject=Re: @Model.Subject" class="btn btn-outline-primary">
+                                <i class="fas fa-reply"></i> Reply via Email
+                            </a>
+                            <button type="button" class="btn btn-outline-secondary" onclick="copyToClipboard('@Model.Email')">
+                                <i class="fas fa-copy"></i> Copy Email
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Contact Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="bg-primary text-white rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-user fa-lg"></i>
+                    </div>
+                    <h5>@Model.Name</h5>
+                    <a href="mailto:@Model.Email" class="text-primary">@Model.Email</a>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <strong>Subject:</strong><br>
+                    <small class="text-muted">@Model.Subject</small>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Received:</strong><br>
+                    <small class="text-muted">@Model.CreatedAt.ToString("MMMM dd, yyyy 'at' h:mm tt")</small>
+                </div>
+
+                <div class="mb-3">
+                    <strong>Status:</strong><br>
+                    <span class="badge @(Model.IsRead ? "bg-secondary" : "bg-success")">
+                        @(Model.IsRead ? "Read" : "New")
+                    </span>
+                </div>
+
+                @if (Model.IsRead && Model.UpdatedAt != Model.CreatedAt)
+                {
+                    <div class="mb-3">
+                        <strong>Last Updated:</strong><br>
+                        <small class="text-muted">@Model.UpdatedAt.ToString("MMMM dd, yyyy 'at' h:mm tt")</small>
+                    </div>
+                }
+
+                <hr>
+
+                <div class="alert alert-info">
+                    <small>
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Tip:</strong> Use the "Reply via Email" button to respond directly from your default email client.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Statistics Card -->
+        <div class="card shadow mt-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Message Stats</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-12 mb-2">
+                        <div class="text-primary">
+                            <i class="fas fa-envelope fa-2x"></i>
+                        </div>
+                        <h6 class="mt-2">Message #@Model.Id</h6>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="small text-muted">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Character Count:</span>
+                        <span>@Model.Message.Length</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Word Count:</span>
+                        <span>@(Model.Message.Split(new char[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show success message
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.classList.remove('btn-outline-secondary');
+                btn.classList.add('btn-success');
+                
+                setTimeout(function() {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-secondary');
+                }, 2000);
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+                alert('Failed to copy email address');
+            });
+        }
+    </script>
+}

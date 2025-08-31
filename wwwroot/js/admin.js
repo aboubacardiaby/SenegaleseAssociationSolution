@@ -1,29 +1,62 @@
-// Admin JavaScript functionality - Enhanced
+// Modern Admin Panel JavaScript - ES6+ with Vanilla JS
 
-// Global admin object for managing state
-const AdminPanel = {
-    init: function() {
-        this.initializeComponents();
-        this.bindEvents();
-        this.loadAnimations();
-    },
+class AdminPanel {
+    constructor() {
+        this.charts = new Map();
+        this.observers = new Map();
+        this.controllers = new Map();
 
-    initializeComponents: function() {
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
+    }
+
+    async init() {
+        console.log('Admin panel initializing...');
+        try {
+            await this.initializeComponents();
+            this.bindEvents();
+            this.loadAnimations();
+            this.createToastContainer();
+            console.log('Admin panel initialized successfully');
+        } catch (error) {
+            console.error('Error initializing admin panel:', error);
+        }
+    }
+
+    async initializeComponents() {
+        // Initialize Bootstrap components if available
+        if (typeof bootstrap !== 'undefined') {
+            this.initializeBootstrapComponents();
+        }
+
+        // Initialize DataTables if available
+        if (typeof DataTable !== 'undefined') {
+            await this.initializeDataTables();
+        }
+
+        // Initialize charts
+        await this.initializeCharts();
+    }
+
+    initializeBootstrapComponents() {
         // Initialize tooltips
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            .forEach(element => new bootstrap.Tooltip(element));
 
-        // Initialize popovers
-        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-        popoverTriggerList.map(function (popoverTriggerEl) {
-            return new bootstrap.Popover(popoverTriggerEl);
-        });
+        // Initialize popovers  
+        document.querySelectorAll('[data-bs-toggle="popover"]')
+            .forEach(element => new bootstrap.Popover(element));
+    }
 
-        // Initialize DataTables if present
-        if ($.fn.DataTable && $('.data-table').length) {
-            $('.data-table').DataTable({
+    async initializeDataTables() {
+        const tables = document.querySelectorAll('.data-table');
+
+        for (const table of tables) {
+            new DataTable(table, {
                 responsive: true,
                 pageLength: 25,
                 language: {
@@ -35,467 +68,761 @@ const AdminPanel = {
                 }
             });
         }
+    }
 
-        // Initialize charts if Chart.js is available
-        this.initializeCharts();
-    },
-
-    bindEvents: function() {
+    bindEvents() {
         // Auto-dismiss alerts
         this.handleAlerts();
-        
+
         // Confirm delete actions
         this.handleDeleteActions();
-        
+
         // Auto-resize textareas
         this.handleTextareas();
-        
+
         // Form validation
         this.handleFormValidation();
-        
+
         // Search functionality
         this.handleSearch();
-        
+
         // Status updates
         this.handleStatusUpdates();
-        
+
         // Loading states
         this.handleLoadingStates();
 
         // File uploads
         this.handleFileUploads();
-    },
 
-    handleAlerts: function() {
+        // Global error handling
+        this.handleGlobalErrors();
+
+        // Window resize handler
+        this.handleWindowResize();
+    }
+
+    handleAlerts() {
         // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').not('.alert-permanent').fadeOut('slow');
-        }, 5000);
+        const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }, 5000);
+        });
 
         // Manual dismiss
-        $('.alert .btn-close').click(function() {
-            $(this).closest('.alert').fadeOut('fast');
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('.alert .btn-close')) {
+                const alert = e.target.closest('.alert');
+                alert.style.transition = 'opacity 0.3s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }
         });
-    },
+    }
 
-    handleDeleteActions: function() {
-        $(document).on('click', '.btn-delete', function(e) {
-            e.preventDefault();
-            const $this = $(this);
-            const itemName = $this.data('item-name') || 'this item';
-            
-            // Create custom confirmation modal
-            const modal = $(`
-                <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title">
-                                    <i class="fas fa-exclamation-triangle"></i> Confirm Deletion
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Are you sure you want to delete <strong>${itemName}</strong>?</p>
-                                <p class="text-muted small">This action cannot be undone.</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-danger" id="confirmDelete">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `);
-            
-            $('body').append(modal);
-            const modalInstance = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-            modalInstance.show();
-            
-            $('#confirmDelete').click(function() {
-                const form = $this.closest('form');
-                if (form.length) {
-                    form.submit();
-                } else {
-                    window.location.href = $this.attr('href');
+    handleDeleteActions() {
+        document.addEventListener('click', async (e) => {
+            if (e.target.matches('.btn-delete') || e.target.closest('.btn-delete')) {
+                e.preventDefault();
+
+                const button = e.target.matches('.btn-delete') ? e.target : e.target.closest('.btn-delete');
+                const itemName = button.dataset.itemName || 'this item';
+
+                const confirmed = await this.showDeleteConfirmation(itemName);
+
+                if (confirmed) {
+                    const form = button.closest('form');
+                    if (form) {
+                        form.submit();
+                    } else {
+                        window.location.href = button.getAttribute('href');
+                    }
                 }
-                modalInstance.hide();
-            });
-            
-            // Clean up modal after hide
-            $('#deleteConfirmModal').on('hidden.bs.modal', function() {
-                $(this).remove();
-            });
-        });
-    },
-
-    handleTextareas: function() {
-        // Auto-resize textareas
-        $('textarea.auto-resize').each(function() {
-            this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
-        }).on('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
-    },
-
-    handleFormValidation: function() {
-        // Real-time form validation
-        $('.form-control').on('blur', function() {
-            const $this = $(this);
-            const value = $this.val().trim();
-            
-            // Remove existing validation classes
-            $this.removeClass('is-valid is-invalid');
-            
-            if ($this.prop('required') && value === '') {
-                $this.addClass('is-invalid');
-                AdminPanel.showFieldError($this, 'This field is required');
-            } else if ($this.attr('type') === 'email' && value !== '' && !AdminPanel.validateEmail(value)) {
-                $this.addClass('is-invalid');
-                AdminPanel.showFieldError($this, 'Please enter a valid email address');
-            } else if (value !== '') {
-                $this.addClass('is-valid');
-                AdminPanel.hideFieldError($this);
             }
         });
-    },
+    }
 
-    handleSearch: function() {
-        // Live search functionality
-        $('.search-input').on('keyup', function() {
-            const searchTerm = $(this).val().toLowerCase();
-            const $searchTarget = $($(this).data('search-target'));
-            
-            $searchTarget.find('.searchable-item').each(function() {
-                const text = $(this).text().toLowerCase();
-                $(this).toggle(text.indexOf(searchTerm) > -1);
+    async showDeleteConfirmation(itemName) {
+        return new Promise((resolve) => {
+            const modal = this.createModal({
+                id: 'deleteConfirmModal',
+                title: '<i class="fas fa-exclamation-triangle"></i> Confirm Deletion',
+                body: `
+                    <p>Are you sure you want to delete <strong>${this.escapeHtml(itemName)}</strong>?</p>
+                    <p class="text-muted small">This action cannot be undone.</p>
+                `,
+                headerClass: 'bg-danger text-white',
+                buttons: [
+                    { text: 'Cancel', class: 'btn-secondary', action: () => resolve(false) },
+                    { text: '<i class="fas fa-trash"></i> Delete', class: 'btn-danger', action: () => resolve(true) }
+                ]
+            });
+
+            document.body.appendChild(modal);
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+
+            modal.addEventListener('hidden.bs.modal', () => {
+                modal.remove();
             });
         });
-    },
+    }
 
-    handleStatusUpdates: function() {
-        // Handle status update buttons
-        $(document).on('click', '.btn-status-update', function(e) {
-            e.preventDefault();
-            const $this = $(this);
-            const originalText = $this.html();
-            
-            // Show loading state
-            $this.html('<div class="spinner"></div> Updating...');
-            $this.prop('disabled', true);
-            
-            // Simulate API call (replace with actual AJAX call)
-            setTimeout(function() {
-                $this.html('<i class="fas fa-check"></i> Updated');
-                $this.removeClass('btn-warning').addClass('btn-success');
-                
-                // Reset after 2 seconds
-                setTimeout(function() {
-                    $this.html(originalText);
-                    $this.removeClass('btn-success').addClass('btn-warning');
-                    $this.prop('disabled', false);
-                }, 2000);
-            }, 1000);
+    handleTextareas() {
+        // Auto-resize textareas using ResizeObserver
+        const textareas = document.querySelectorAll('textarea.auto-resize');
+
+        textareas.forEach(textarea => {
+            // Initial resize
+            this.resizeTextarea(textarea);
+
+            // Handle input events
+            textarea.addEventListener('input', () => this.resizeTextarea(textarea));
+
+            // Use ResizeObserver for better performance
+            const observer = new ResizeObserver(() => this.resizeTextarea(textarea));
+            observer.observe(textarea);
+            this.observers.set(textarea, observer);
         });
-    },
+    }
 
-    handleLoadingStates: function() {
-        // Add loading states to forms
-        $('form').on('submit', function() {
-            const $submitBtn = $(this).find('button[type="submit"]');
-            if ($submitBtn.length) {
-                const originalText = $submitBtn.html();
-                $submitBtn.html('<div class="spinner"></div> Processing...');
-                $submitBtn.prop('disabled', true);
-                
-                // Store original text for potential restoration
-                $submitBtn.data('original-text', originalText);
+    resizeTextarea(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+
+    handleFormValidation() {
+        const formControls = document.querySelectorAll('.form-control');
+
+        formControls.forEach(control => {
+            control.addEventListener('blur', () => this.validateField(control));
+            control.addEventListener('input', () => this.clearValidationState(control));
+        });
+    }
+
+    validateField(field) {
+        const value = field.value.trim();
+
+        // Remove existing validation classes
+        field.classList.remove('is-valid', 'is-invalid');
+
+        if (field.hasAttribute('required') && value === '') {
+            field.classList.add('is-invalid');
+            this.showFieldError(field, 'This field is required');
+        } else if (field.type === 'email' && value !== '' && !this.validateEmail(value)) {
+            field.classList.add('is-invalid');
+            this.showFieldError(field, 'Please enter a valid email address');
+        } else if (value !== '') {
+            field.classList.add('is-valid');
+            this.hideFieldError(field);
+        }
+    }
+
+    clearValidationState(field) {
+        field.classList.remove('is-valid', 'is-invalid');
+        this.hideFieldError(field);
+    }
+
+    handleSearch() {
+        const searchInputs = document.querySelectorAll('.search-input');
+
+        searchInputs.forEach(input => {
+            // Debounce search for better performance
+            let timeoutId;
+
+            input.addEventListener('input', () => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    const searchTerm = input.value.toLowerCase();
+                    const targetSelector = input.dataset.searchTarget;
+                    const searchTarget = document.querySelector(targetSelector);
+
+                    if (searchTarget) {
+                        const searchableItems = searchTarget.querySelectorAll('.searchable-item');
+                        searchableItems.forEach(item => {
+                            const text = item.textContent.toLowerCase();
+                            item.style.display = text.includes(searchTerm) ? '' : 'none';
+                        });
+                    }
+                }, 300);
+            });
+        });
+    }
+
+    handleStatusUpdates() {
+        document.addEventListener('click', async (e) => {
+            if (e.target.matches('.btn-status-update') || e.target.closest('.btn-status-update')) {
+                e.preventDefault();
+
+                const button = e.target.matches('.btn-status-update') ? e.target : e.target.closest('.btn-status-update');
+                const originalHTML = button.innerHTML;
+
+                try {
+                    // Show loading state
+                    button.innerHTML = '<div class="spinner"></div> Updating...';
+                    button.disabled = true;
+
+                    // Simulate API call (replace with actual fetch call)
+                    await this.delay(1000);
+
+                    // Show success state
+                    button.innerHTML = '<i class="fas fa-check"></i> Updated';
+                    button.classList.remove('btn-warning');
+                    button.classList.add('btn-success');
+
+                    // Reset after 2 seconds
+                    await this.delay(2000);
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-warning');
+                    button.disabled = false;
+
+                } catch (error) {
+                    console.error('Status update failed:', error);
+                    button.innerHTML = originalHTML;
+                    button.disabled = false;
+                    this.showToast('Update failed. Please try again.', 'error');
+                }
             }
         });
-    },
+    }
 
-    handleFileUploads: function() {
-        // Enhanced file upload handling
-        $('.file-upload-area').on('dragover', function(e) {
-            e.preventDefault();
-            $(this).addClass('drag-over');
-        }).on('dragleave', function(e) {
-            e.preventDefault();
-            $(this).removeClass('drag-over');
-        }).on('drop', function(e) {
-            e.preventDefault();
-            $(this).removeClass('drag-over');
-            
-            const files = e.originalEvent.dataTransfer.files;
-            AdminPanel.handleFiles(files, $(this));
+    handleLoadingStates() {
+        document.addEventListener('submit', (e) => {
+            if (e.target.matches('form')) {
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<div class="spinner"></div> Processing...';
+                    submitBtn.disabled = true;
+                    submitBtn.dataset.originalText = originalText;
+                }
+            }
         });
-        
-        $('.file-input').on('change', function() {
-            const files = this.files;
-            AdminPanel.handleFiles(files, $(this).closest('.file-upload-area'));
-        });
-    },
+    }
 
-    handleFiles: function(files, $container) {
-        Array.from(files).forEach(file => {
-            // Validate file type and size
-            if (AdminPanel.validateFile(file)) {
-                AdminPanel.displayFilePreview(file, $container);
+    handleFileUploads() {
+        const fileUploadAreas = document.querySelectorAll('.file-upload-area');
+
+        fileUploadAreas.forEach(area => {
+            // Drag and drop handlers
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('drag-over');
+            });
+
+            area.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                area.classList.remove('drag-over');
+            });
+
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('drag-over');
+
+                const files = Array.from(e.dataTransfer.files);
+                this.handleFiles(files, area);
+            });
+
+            // File input change handler
+            const fileInput = area.querySelector('.file-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files);
+                    this.handleFiles(files, area);
+                });
+            }
+        });
+    }
+
+    handleFiles(files, container) {
+        files.forEach(file => {
+            if (this.validateFile(file)) {
+                this.displayFilePreview(file, container);
             } else {
-                AdminPanel.showToast('Invalid file type or size', 'error');
+                this.showToast('Invalid file type or size', 'error');
             }
         });
-    },
+    }
 
-    validateFile: function(file) {
+    validateFile(file) {
         const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
         const maxSize = 5 * 1024 * 1024; // 5MB
-        
+
         return allowedTypes.includes(file.type) && file.size <= maxSize;
-    },
+    }
 
-    displayFilePreview: function(file, $container) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = $(`
-                <div class="file-preview">
-                    <img src="${e.target.result}" alt="${file.name}" class="preview-image">
-                    <div class="file-info">
-                        <span class="file-name">${file.name}</span>
-                        <span class="file-size">${AdminPanel.formatFileSize(file.size)}</span>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-danger remove-file">
-                        <i class="fas fa-times"></i>
-                    </button>
+    async displayFilePreview(file, container) {
+        try {
+            const dataUrl = await this.readFileAsDataURL(file);
+
+            const preview = document.createElement('div');
+            preview.className = 'file-preview';
+            preview.innerHTML = `
+                <img src="${dataUrl}" alt="${this.escapeHtml(file.name)}" class="preview-image">
+                <div class="file-info">
+                    <span class="file-name">${this.escapeHtml(file.name)}</span>
+                    <span class="file-size">${this.formatFileSize(file.size)}</span>
                 </div>
-            `);
-            
-            $container.find('.file-previews').append(preview);
-        };
-        reader.readAsDataURL(file);
-    },
+                <button type="button" class="btn btn-sm btn-danger remove-file">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
 
-    initializeCharts: function() {
-        // Initialize Chart.js charts if available
-        if (typeof Chart !== 'undefined') {
-            // Financial Overview Chart
-            const financialCtx = document.getElementById('financialChart');
-            if (financialCtx) {
-                new Chart(financialCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                        datasets: [{
-                            label: 'Income',
-                            data: [8000, 9500, 12000, 11500, 13000, 12500],
-                            borderColor: '#00A86B',
-                            backgroundColor: 'rgba(0, 168, 107, 0.1)',
-                            tension: 0.4
-                        }, {
-                            label: 'Expenses',
-                            data: [7500, 8200, 9800, 8900, 9500, 8900],
-                            borderColor: '#e74a3b',
-                            backgroundColor: 'rgba(231, 74, 59, 0.1)',
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return '$' + value.toLocaleString();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+            // Add remove functionality
+            preview.querySelector('.remove-file').addEventListener('click', () => {
+                preview.remove();
+            });
+
+            const previewsContainer = container.querySelector('.file-previews');
+            if (previewsContainer) {
+                previewsContainer.appendChild(preview);
             }
-            
-            // Donations Chart
-            const donationsCtx = document.getElementById('donationsChart');
-            if (donationsCtx) {
-                new Chart(donationsCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Events', 'Facilities', 'Administration', 'Programs'],
-                        datasets: [{
-                            data: [45000, 25000, 15000, 13000],
-                            backgroundColor: [
-                                '#00A86B',
-                                '#4e73df',
-                                '#f6c23e',
-                                '#e74a3b'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            }
+        } catch (error) {
+            console.error('Error creating file preview:', error);
+            this.showToast('Error creating file preview', 'error');
         }
-    },
+    }
 
-    loadAnimations: function() {
+    async initializeCharts() {
+        if (typeof Chart === 'undefined') return;
+
+        // Financial Overview Chart
+        const financialCtx = document.getElementById('financialChart');
+        if (financialCtx) {
+            const financialChart = new Chart(financialCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Income',
+                        data: [8000, 9500, 12000, 11500, 13000, 12500],
+                        borderColor: '#00A86B',
+                        backgroundColor: 'rgba(0, 168, 107, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Expenses',
+                        data: [7500, 8200, 9800, 8900, 9500, 8900],
+                        borderColor: '#e74a3b',
+                        backgroundColor: 'rgba(231, 74, 59, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (value) => `$${value.toLocaleString()}`
+                            }
+                        }
+                    }
+                }
+            });
+
+            this.charts.set('financial', financialChart);
+        }
+
+        // Donations Chart
+        const donationsCtx = document.getElementById('donationsChart');
+        if (donationsCtx) {
+            const donationsChart = new Chart(donationsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Events', 'Facilities', 'Administration', 'Programs'],
+                    datasets: [{
+                        data: [45000, 25000, 15000, 13000],
+                        backgroundColor: [
+                            '#00A86B',
+                            '#4e73df',
+                            '#f6c23e',
+                            '#e74a3b'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            this.charts.set('donations', donationsChart);
+        }
+    }
+
+    loadAnimations() {
         // Add fade-in animation to cards
-        $('.card').addClass('fade-in');
-        
-        // Stagger animations for dashboard cards
-        $('.stats-card').each(function(index) {
-            $(this).css('animation-delay', (index * 0.1) + 's');
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.classList.add('fade-in');
         });
-        
+
+        // Stagger animations for dashboard cards using Intersection Observer
+        const statsCards = document.querySelectorAll('.stats-card');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.animationDelay = `${index * 0.1}s`;
+                        entry.target.classList.add('animate-in');
+                    }, index * 100);
+                }
+            });
+        });
+
+        statsCards.forEach(card => observer.observe(card));
+
         // Smooth scrolling for anchor links
-        $('a[href*="#"]').not('[href="#"]').click(function() {
-            if (location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') && location.hostname === this.hostname) {
-                let target = $(this.hash);
-                target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
-                if (target.length) {
-                    $('html, body').animate({
-                        scrollTop: target.offset().top - 70
-                    }, 800);
-                    return false;
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('a[href*="#"]') && !e.target.matches('a[href="#"]')) {
+                const target = e.target;
+                if (location.pathname.replace(/^\//, '') === target.pathname.replace(/^\//, '') &&
+                    location.hostname === target.hostname) {
+
+                    const targetElement = document.querySelector(target.hash) ||
+                        document.querySelector(`[name="${target.hash.slice(1)}"]`);
+
+                    if (targetElement) {
+                        e.preventDefault();
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+
+                        // Offset for fixed headers
+                        setTimeout(() => {
+                            window.scrollBy(0, -70);
+                        }, 0);
+                    }
                 }
             }
         });
-    },
+    }
 
-    // Utility functions
-    validateEmail: function(email) {
+    handleGlobalErrors() {
+        // Global fetch error handler
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            this.showToast('An unexpected error occurred. Please try again.', 'error');
+        });
+
+        // Global error handler
+        window.addEventListener('error', (e) => {
+            console.error('Global error:', e.error);
+        });
+    }
+
+    handleWindowResize() {
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // Resize charts
+                this.charts.forEach(chart => {
+                    if (chart && typeof chart.resize === 'function') {
+                        chart.resize();
+                    }
+                });
+            }, 250);
+        });
+    }
+
+    createToastContainer() {
+        if (!document.getElementById('toast-container')) {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            document.body.appendChild(container);
+        }
+    }
+
+    // Utility Methods
+    createModal({ id, title, body, headerClass = '', buttons = [] }) {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = id;
+        modal.setAttribute('tabindex', '-1');
+
+        const buttonsHTML = buttons.map(btn =>
+            `<button type="button" class="btn ${btn.class}" data-action="${btn.action || 'dismiss'}">${btn.text}</button>`
+        ).join('');
+
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header ${headerClass}">
+                        <h5 class="modal-title">${title}</h5>
+                        <button type="button" class="btn-close ${headerClass.includes('text-white') ? 'btn-close-white' : ''}" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">${body}</div>
+                    <div class="modal-footer">${buttonsHTML}</div>
+                </div>
+            </div>
+        `;
+
+        // Add button event listeners
+        buttons.forEach((btn, index) => {
+            const buttonElement = modal.querySelectorAll('.modal-footer .btn')[index];
+            if (btn.action && typeof btn.action === 'function') {
+                buttonElement.addEventListener('click', () => {
+                    btn.action();
+                    const modalInstance = bootstrap.Modal.getInstance(modal);
+                    if (modalInstance) modalInstance.hide();
+                });
+            }
+        });
+
+        return modal;
+    }
+
+    validateEmail(email) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email);
-    },
+    }
 
-    showFieldError: function($field, message) {
-        $field.siblings('.invalid-feedback').remove();
-        $field.after(`<div class="invalid-feedback">${message}</div>`);
-    },
+    showFieldError(field, message) {
+        this.hideFieldError(field);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback';
+        errorDiv.textContent = message;
+        field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    }
 
-    hideFieldError: function($field) {
-        $field.siblings('.invalid-feedback').remove();
-    },
+    hideFieldError(field) {
+        const existingError = field.parentNode.querySelector('.invalid-feedback');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
 
-    formatFileSize: function(bytes) {
+    formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    },
+    }
 
-    showToast: function(message, type = 'info') {
-        const toast = $(`
-            <div class="toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'primary'} border-0" role="alert">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
+    showToast(message, type = 'info') {
+        const toastTypes = {
+            error: 'danger',
+            success: 'success',
+            warning: 'warning',
+            info: 'primary'
+        };
+
+        const bgClass = toastTypes[type] || 'primary';
+
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${bgClass} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${this.escapeHtml(message)}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
-        `);
-        
-        $('#toast-container').append(toast);
-        const toastInstance = new bootstrap.Toast(toast[0]);
+        `;
+
+        const container = document.getElementById('toast-container');
+        container.appendChild(toast);
+
+        const toastInstance = new bootstrap.Toast(toast);
         toastInstance.show();
-        
-        // Remove toast element after it's hidden
-        toast.on('hidden.bs.toast', function() {
-            $(this).remove();
+
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
         });
-    },
 
-    // Real-time notifications (WebSocket placeholder)
-    initializeNotifications: function() {
-        // Placeholder for real-time notifications
-        // This would typically connect to a WebSocket or use Server-Sent Events
-        setInterval(() => {
-            // Simulate checking for new messages
-            AdminPanel.checkNewMessages();
-        }, 60000); // Check every minute
-    },
+        return toastInstance;
+    }
 
-    checkNewMessages: function() {
-        // Placeholder for checking new messages
-        // In a real application, this would make an AJAX call
-        const newMessageCount = Math.floor(Math.random() * 3);
-        if (newMessageCount > 0) {
-            $('.message-count-badge').text(newMessageCount).show();
-            AdminPanel.showToast(`${newMessageCount} new message(s) received`, 'info');
+    escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // API Methods (replace jQuery AJAX)
+    async fetchJSON(url, options = {}) {
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Fetch error:', error);
+            this.showToast('Network error. Please try again.', 'error');
+            throw error;
         }
+    }
+
+    async postJSON(url, data, options = {}) {
+        return this.fetchJSON(url, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            ...options
+        });
+    }
+
+    // Real-time notifications (modern approach)
+    initializeNotifications() {
+        // Use Server-Sent Events or WebSocket for real-time updates
+        if (typeof EventSource !== 'undefined') {
+            const eventSource = new EventSource('/api/notifications');
+
+            eventSource.addEventListener('message', (e) => {
+                const data = JSON.parse(e.data);
+                this.handleNotification(data);
+            });
+
+            eventSource.addEventListener('error', (e) => {
+                console.error('SSE error:', e);
+                eventSource.close();
+
+                // Fallback to polling
+                setTimeout(() => this.initializePolling(), 5000);
+            });
+        } else {
+            // Fallback to polling for older browsers
+            this.initializePolling();
+        }
+    }
+
+    initializePolling() {
+        setInterval(async () => {
+            try {
+                const data = await this.fetchJSON('/api/notifications/check');
+                if (data.newMessages > 0) {
+                    this.updateMessageBadge(data.newMessages);
+                    this.showToast(`${data.newMessages} new message(s) received`, 'info');
+                }
+            } catch (error) {
+                console.error('Polling error:', error);
+            }
+        }, 60000); // Check every minute
+    }
+
+    handleNotification(data) {
+        switch (data.type) {
+            case 'new_message':
+                this.updateMessageBadge(data.count);
+                this.showToast(`${data.count} new message(s) received`, 'info');
+                break;
+            case 'status_update':
+                this.showToast(data.message, 'success');
+                break;
+            default:
+                console.log('Unknown notification type:', data.type);
+        }
+    }
+
+    updateMessageBadge(count) {
+        const badge = document.querySelector('.message-count-badge');
+        if (badge) {
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+    }
+
+    // Cleanup method
+    destroy() {
+        // Clean up observers
+        this.observers.forEach(observer => observer.disconnect());
+        this.observers.clear();
+
+        // Clean up controllers
+        this.controllers.forEach(controller => controller.abort());
+        this.controllers.clear();
+
+        // Clean up charts
+        this.charts.forEach(chart => chart.destroy());
+        this.charts.clear();
+    }
+}
+
+// Global utility functions for backwards compatibility
+window.fillCredentials = (email, password) => {
+    const emailInput = document.querySelector('input[name="Email"]');
+    const passwordInput = document.querySelector('input[name="Password"]');
+
+    if (emailInput && passwordInput) {
+        emailInput.value = email;
+        passwordInput.value = password;
+
+        // Trigger input events for frameworks that rely on them
+        [emailInput, passwordInput].forEach(input => {
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        console.log('Credentials filled successfully');
+    } else {
+        console.error('Could not find email or password input fields');
     }
 };
 
-// Initialize admin panel when document is ready
-$(document).ready(function() {
-    AdminPanel.init();
-    
-    // Create toast container if it doesn't exist
-    if (!$('#toast-container').length) {
-        $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>');
-    }
-    
-    // Initialize notifications (if needed)
-    // AdminPanel.initializeNotifications();
-});
+window.togglePassword = () => {
+    const passwordInput = document.querySelector('input[name="Password"]');
+    const toggleIcon = document.getElementById('passwordToggleIcon');
 
-// Global error handler for AJAX requests
-$(document).ajaxError(function(event, xhr, settings, thrownError) {
-    console.error('AJAX Error:', thrownError);
-    AdminPanel.showToast('An error occurred. Please try again.', 'error');
-});
+    if (passwordInput && toggleIcon) {
+        const isPassword = passwordInput.type === 'password';
 
-// Handle window resize for responsive charts
-$(window).resize(function() {
-    if (typeof Chart !== 'undefined') {
-        try {
-            // Chart.js v3+ uses Chart.instances as an object, not array
-            if (Chart.instances) {
-                if (Array.isArray(Chart.instances)) {
-                    // Chart.js v2.x
-                    Chart.instances.forEach(function(chart) {
-                        if (chart && typeof chart.resize === 'function') {
-                            chart.resize();
-                        }
-                    });
-                } else {
-                    // Chart.js v3+
-                    Object.values(Chart.instances).forEach(function(chart) {
-                        if (chart && typeof chart.resize === 'function') {
-                            chart.resize();
-                        }
-                    });
-                }
-            }
-            // Alternative: Chart.js v4+ registry approach
-            else if (Chart.registry && Chart.registry.getAll) {
-                Chart.registry.getAll().forEach(function(chart) {
-                    if (chart && typeof chart.resize === 'function') {
-                        chart.resize();
-                    }
-                });
-            }
-        } catch (error) {
-            console.warn('Chart resize error:', error);
-        }
+        passwordInput.type = isPassword ? 'text' : 'password';
+        toggleIcon.classList.toggle('fa-eye', !isPassword);
+        toggleIcon.classList.toggle('fa-eye-slash', isPassword);
+
+        // Update ARIA attributes for accessibility
+        passwordInput.setAttribute('aria-describedby', 'password-visibility');
+        toggleIcon.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
     }
-});
+};
+
+// Initialize the admin panel
+const adminPanel = new AdminPanel();
+
+// Export for module systems
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = AdminPanel;
+}

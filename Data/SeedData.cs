@@ -24,6 +24,9 @@ namespace SenegaleseAssociation.Data
                 }
             }
 
+            // Seed Super Admin User (with ultimate access)
+            await SeedAdminUser(userManager, "superadmin@samn.org", "Super", "Admin", "SuperAdmin2024!@#", Roles.SuperAdmin);
+            
             // Seed Admin Users
             await SeedAdminUser(userManager, "admin@samn.org", "Admin", "User", "Admin123!", Roles.Admin);
             await SeedAdminUser(userManager, "finance@samn.org", "Finance", "Manager", "Finance123!", Roles.Finance);

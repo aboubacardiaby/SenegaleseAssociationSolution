@@ -16,6 +16,7 @@ namespace SenegaleseAssociation.Data
         public DbSet<CommunityHighlight> CommunityHighlights { get; set; }
         public DbSet<Testimonial> Testimonials { get; set; }
         public DbSet<ContactMessage> ContactMessages { get; set; }
+        public DbSet<Member> Members { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -100,6 +101,36 @@ namespace SenegaleseAssociation.Data
                 entity.Property(c => c.Subject).IsRequired().HasMaxLength(200);
                 entity.Property(c => c.Message).IsRequired().HasMaxLength(2000);
                 entity.HasIndex(c => c.CreatedAt);
+            });
+
+            // Member configuration
+            modelBuilder.Entity<Member>(entity =>
+            {
+                entity.HasKey(m => m.Id);
+                entity.Property(m => m.FirstName).IsRequired().HasMaxLength(100);
+                entity.Property(m => m.LastName).IsRequired().HasMaxLength(100);
+                entity.Property(m => m.Email).IsRequired().HasMaxLength(255);
+                entity.Property(m => m.PhoneNumber).IsRequired().HasMaxLength(20);
+                entity.Property(m => m.Address).HasMaxLength(255);
+                entity.Property(m => m.City).HasMaxLength(100);
+                entity.Property(m => m.State).HasMaxLength(50);
+                entity.Property(m => m.PostalCode).HasMaxLength(20);
+                entity.Property(m => m.Country).HasMaxLength(100);
+                entity.Property(m => m.Gender).IsRequired().HasMaxLength(20);
+                entity.Property(m => m.Profession).HasMaxLength(100);
+                entity.Property(m => m.EmergencyContactName).HasMaxLength(100);
+                entity.Property(m => m.EmergencyContactPhone).HasMaxLength(20);
+                entity.Property(m => m.MembershipStatus).IsRequired().HasMaxLength(20);
+                entity.Property(m => m.Notes).HasMaxLength(500);
+                entity.HasIndex(m => m.Email).IsUnique();
+                entity.HasIndex(m => m.MembershipStatus);
+                entity.HasIndex(m => m.RegistrationDate);
+                entity.HasIndex(m => m.IsActive);
+                
+                entity.HasOne(m => m.ApprovedBy)
+                      .WithMany()
+                      .HasForeignKey(m => m.ApprovedById)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
         }
 

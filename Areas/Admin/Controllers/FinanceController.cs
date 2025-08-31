@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SenegaleseAssociation.Areas.Admin.Models;
 using SenegaleseAssociation.Constants;
+using Microsoft.AspNetCore.Authorization;
+using SenegaleseAssociation.Areas.Admin.Models;
 
 namespace SenegaleseAssociation.Areas.Admin.Controllers
 {

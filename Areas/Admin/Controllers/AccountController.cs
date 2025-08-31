@@ -37,6 +37,9 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl)
+        
+        
+        
         {
             ViewData["ReturnUrl"] = returnUrl;
             
@@ -60,11 +63,9 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
                 model?.Email ?? "NULL", 
                 model?.Password?.Length ?? 0, 
                 model?.RememberMe ?? false);
-            model.Email = "admin@samn.org";
-            model.Password = "Admin123!";
-            model.RememberMe = true;
+           
             // Log ModelState errors
-            if (!!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 foreach (var modelError in ModelState)
                 {
@@ -75,7 +76,7 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
                 }
             }
 
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user != null && user.IsActive)
@@ -119,9 +120,62 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
-            _logger.LogInformation("Admin user logged out.");
-            return RedirectToAction("Index", "Home", new { area = "" });
+            var userEmail = User.Identity?.Name;
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            
+            try
+            {
+                // Get user before signing out to update last activity
+                if (!string.IsNullOrEmpty(userEmail))
+                {
+                    var user = await _userManager.FindByEmailAsync(userEmail);
+                    if (user != null)
+                    {
+                        user.LastActivityAt = DateTime.UtcNow;
+                        await _userManager.UpdateAsync(user);
+                        
+                        _logger.LogInformation("Admin user {Email} (ID: {UserId}) logged out successfully at {Time}", 
+                            userEmail, userId, DateTime.UtcNow);
+                    }
+                }
+                
+                // Sign out the user
+                await _signInManager.SignOutAsync();
+                
+                // Clear any additional session data or cache if needed
+                HttpContext.Session.Clear();
+                
+                // Add success message for the next request
+                TempData["LogoutSuccess"] = "You have been successfully logged out.";
+                
+                _logger.LogInformation("Logout process completed for user {Email}", userEmail ?? "Unknown");
+                
+                return RedirectToAction("Index", "Home", new { area = "" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during logout process for user {Email}", userEmail ?? "Unknown");
+                
+                // Even if there's an error, still try to sign out
+                try
+                {
+                    await _signInManager.SignOutAsync();
+                    HttpContext.Session.Clear();
+                }
+                catch (Exception signOutEx)
+                {
+                    _logger.LogError(signOutEx, "Failed to sign out user during error handling");
+                }
+                
+                TempData["Error"] = "An error occurred during logout, but you have been signed out.";
+                return RedirectToAction("Index", "Home", new { area = "" });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult LogoutConfirm()
+        {
+            return View();
         }
 
         [HttpGet]

@@ -20,10 +20,10 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
 
         public IActionResult Settings()
         {
-            var settings = new
+            var settings = new SystemSettingsViewModel
             {
                 DatabaseProvider = "SQL Server",
-                Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production",
+                Environment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production",
                 Version = "1.0.0",
                 LastBackup = "Not Configured",
                 MaintenanceMode = false

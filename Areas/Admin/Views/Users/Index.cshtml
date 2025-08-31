@@ -1,4 +1,4 @@
-@model IEnumerable<dynamic>
+@model IEnumerable<SenegaleseAssociation.Areas.Admin.Models.UserListViewModel>
 @{
     ViewData["Title"] = "Users Management";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
@@ -48,7 +48,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (dynamic item in Model)
+                    @foreach (var item in Model)
                     {
                         <tr>
                             <td>@item.User.FirstName @item.User.LastName</td>
@@ -116,9 +116,11 @@
         });
 
         function confirmDelete(userId, userName) {
-            $('#deleteUserId').val(userId);
-            $('#userName').text(userName);
-            $('#deleteModal').modal('show');
+            document.getElementById('deleteUserId').value = userId;
+            document.getElementById('userName').textContent = userName;
+            
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
         }
     </script>
 }

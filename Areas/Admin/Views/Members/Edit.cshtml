@@ -1,0 +1,248 @@
+@model SenegaleseAssociation.Models.Member
+@{
+    ViewData["Title"] = "Edit Member";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-user-edit text-primary"></i> Edit Member
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Index" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info">
+            <i class="fas fa-eye"></i> View Details
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="RegistrationDate" />
+                    <input type="hidden" asp-for="MembershipStatus" />
+                    <input type="hidden" asp-for="ApprovedDate" />
+                    <input type="hidden" asp-for="ApprovedById" />
+
+                    <!-- Personal Information -->
+                    <h4 class="mb-3 text-primary">
+                        <i class="fas fa-user"></i> Personal Information
+                    </h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="FirstName" class="form-label">First Name *</label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LastName" class="form-label">Last Name *</label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label">Email Address *</label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PhoneNumber" class="form-label">Phone Number *</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="DateOfBirth" class="form-label">Date of Birth *</label>
+                            <input asp-for="DateOfBirth" class="form-control" type="date" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Gender" class="form-label">Gender *</label>
+                            <select asp-for="Gender" class="form-select">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer not to say">Prefer not to say</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Profession" class="form-label">Profession</label>
+                        <input asp-for="Profession" class="form-control" />
+                        <span asp-validation-for="Profession" class="text-danger"></span>
+                    </div>
+
+                    <!-- Address Information -->
+                    <h4 class="mb-3 text-primary">
+                        <i class="fas fa-map-marker-alt"></i> Address Information
+                    </h4>
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label">Street Address</label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label asp-for="City" class="form-label">City</label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="State" class="form-label">State</label>
+                            <input asp-for="State" class="form-control" />
+                            <span asp-validation-for="State" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="PostalCode" class="form-label">Postal Code</label>
+                            <input asp-for="PostalCode" class="form-control" />
+                            <span asp-validation-for="PostalCode" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="Country" class="form-label">Country</label>
+                            <select asp-for="Country" class="form-select">
+                                <option value="">Select Country</option>
+                                <option value="United States">United States</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Senegal">Senegal</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Country" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Contact -->
+                    <h4 class="mb-3 text-primary">
+                        <i class="fas fa-phone"></i> Emergency Contact
+                    </h4>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="EmergencyContactName" class="form-label">Emergency Contact Name</label>
+                            <input asp-for="EmergencyContactName" class="form-control" />
+                            <span asp-validation-for="EmergencyContactName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EmergencyContactPhone" class="form-label">Emergency Contact Phone</label>
+                            <input asp-for="EmergencyContactPhone" class="form-control" />
+                            <span asp-validation-for="EmergencyContactPhone" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Admin Notes -->
+                    <h4 class="mb-3 text-primary">
+                        <i class="fas fa-sticky-note"></i> Admin Notes
+                    </h4>
+                    <div class="mb-3">
+                        <label asp-for="Notes" class="form-label">Notes</label>
+                        <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Internal notes and comments..."></textarea>
+                        <span asp-validation-for="Notes" class="text-danger"></span>
+                    </div>
+
+                    <!-- Account Status -->
+                    <h4 class="mb-3 text-primary">
+                        <i class="fas fa-cog"></i> Account Settings
+                    </h4>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsActive" class="form-check-label">
+                                Account is active
+                            </label>
+                            <span asp-validation-for="IsActive" class="text-danger"></span>
+                        </div>
+                        <small class="form-text text-muted">Inactive accounts cannot access member features</small>
+                    </div>
+
+                    <div class="text-end">
+                        <a asp-action="Index" class="btn btn-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Member Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="bg-primary text-white rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-user fa-lg"></i>
+                    </div>
+                    <h6>@Model.FullName</h6>
+                </div>
+
+                <hr>
+
+                <div class="mb-2">
+                    <strong>Member ID:</strong><br>
+                    <small class="text-muted">#@Model.Id.ToString("D6")</small>
+                </div>
+
+                <div class="mb-2">
+                    <strong>Registration Date:</strong><br>
+                    <small class="text-muted">@Model.RegistrationDate.ToString("MMM dd, yyyy")</small>
+                </div>
+
+                <div class="mb-2">
+                    <strong>Status:</strong><br>
+                    @switch (Model.MembershipStatus)
+                    {
+                        case "Pending":
+                            <span class="badge bg-warning">Pending</span>
+                            break;
+                        case "Active":
+                            <span class="badge bg-success">Active</span>
+                            break;
+                        case "Suspended":
+                            <span class="badge bg-danger">Suspended</span>
+                            break;
+                        case "Rejected":
+                            <span class="badge bg-secondary">Rejected</span>
+                            break;
+                    }
+                </div>
+
+                @if (Model.ApprovedDate.HasValue)
+                {
+                    <div class="mb-2">
+                        <strong>Approved Date:</strong><br>
+                        <small class="text-muted">@Model.ApprovedDate.Value.ToString("MMM dd, yyyy")</small>
+                    </div>
+                }
+
+                <hr>
+
+                <div class="alert alert-info">
+                    <small>
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Note:</strong> Changes to membership status should be made through the member actions in the details page.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

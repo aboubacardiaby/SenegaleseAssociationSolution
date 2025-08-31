@@ -1,0 +1,317 @@
+@model SenegaleseAssociation.Models.Member
+@{
+    ViewData["Title"] = "Join Our Community";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main id="main" style="padding-top: 100px;">
+    <section class="container">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div class="hero-content" style="text-align: center; margin-bottom: 60px;">
+                <h1 style="font-size: 3rem; font-weight: 700; color: #00A86B; margin-bottom: 20px;">Join Our Community</h1>
+                <p style="font-size: 1.2rem; color: #666; max-width: 600px; margin: 0 auto;">Become a member of the Senegalese Association of Minnesota and connect with our vibrant community.</p>
+            </div>
+
+            <div style="background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); padding: 40px; margin-bottom: 40px;">
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Personal Information -->
+                        <h3 style="color: #00A86B; margin-bottom: 30px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-user"></i> Personal Information
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label asp-for="FirstName">First Name *</label>
+                                <input asp-for="FirstName" />
+                                <span asp-validation-for="FirstName" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LastName">Last Name *</label>
+                                <input asp-for="LastName" />
+                                <span asp-validation-for="LastName" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label asp-for="Email">Email Address *</label>
+                                <input asp-for="Email" type="email" />
+                                <span asp-validation-for="Email" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="PhoneNumber">Phone Number *</label>
+                                <input asp-for="PhoneNumber" />
+                                <span asp-validation-for="PhoneNumber" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label asp-for="DateOfBirth">Date of Birth *</label>
+                                <input asp-for="DateOfBirth" type="date" />
+                                <span asp-validation-for="DateOfBirth" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Gender">Gender *</label>
+                                <select asp-for="Gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </select>
+                                <span asp-validation-for="Gender" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label asp-for="Profession">Profession</label>
+                            <input asp-for="Profession" />
+                            <span asp-validation-for="Profession" style="color: #dc3545; font-size: 0.875rem;"></span>
+                        </div>
+
+                        <!-- Address Information -->
+                        <h3 style="color: #00A86B; margin-bottom: 30px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-map-marker-alt"></i> Address Information
+                        </h3>
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label asp-for="Address">Street Address</label>
+                            <input asp-for="Address" />
+                            <span asp-validation-for="Address" style="color: #dc3545; font-size: 0.875rem;"></span>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label asp-for="City">City</label>
+                                <input asp-for="City" />
+                                <span asp-validation-for="City" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="PostalCode">Postal Code</label>
+                                <input asp-for="PostalCode" />
+                                <span asp-validation-for="PostalCode" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Country">Country</label>
+                                <select asp-for="Country" id="countrySelect" onchange="toggleStateDropdown()">
+                                    <option value="">Select Country</option>
+                                    <option value="United States">United States</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Senegal">Senegal</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span asp-validation-for="Country" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                        </div>
+
+                        <!-- US States Dropdown - Hidden by default -->
+                        <div id="stateDropdown" class="form-group" style="margin-bottom: 30px; display: none;">
+                            <label for="stateSelect">State</label>
+                            <select id="stateSelect" name="State" style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 16px; background: white; transition: border-color 0.3s ease;">
+                                <option value="">Select State</option>
+                                <option value="Alabama">Alabama</option>
+                                <option value="Alaska">Alaska</option>
+                                <option value="Arizona">Arizona</option>
+                                <option value="Arkansas">Arkansas</option>
+                                <option value="California">California</option>
+                                <option value="Colorado">Colorado</option>
+                                <option value="Connecticut">Connecticut</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Hawaii">Hawaii</option>
+                                <option value="Idaho">Idaho</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Indiana">Indiana</option>
+                                <option value="Iowa">Iowa</option>
+                                <option value="Kansas">Kansas</option>
+                                <option value="Kentucky">Kentucky</option>
+                                <option value="Louisiana">Louisiana</option>
+                                <option value="Maine">Maine</option>
+                                <option value="Maryland">Maryland</option>
+                                <option value="Massachusetts">Massachusetts</option>
+                                <option value="Michigan">Michigan</option>
+                                <option value="Minnesota">Minnesota</option>
+                                <option value="Mississippi">Mississippi</option>
+                                <option value="Missouri">Missouri</option>
+                                <option value="Montana">Montana</option>
+                                <option value="Nebraska">Nebraska</option>
+                                <option value="Nevada">Nevada</option>
+                                <option value="New Hampshire">New Hampshire</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="New Mexico">New Mexico</option>
+                                <option value="New York">New York</option>
+                                <option value="North Carolina">North Carolina</option>
+                                <option value="North Dakota">North Dakota</option>
+                                <option value="Ohio">Ohio</option>
+                                <option value="Oklahoma">Oklahoma</option>
+                                <option value="Oregon">Oregon</option>
+                                <option value="Pennsylvania">Pennsylvania</option>
+                                <option value="Rhode Island">Rhode Island</option>
+                                <option value="South Carolina">South Carolina</option>
+                                <option value="South Dakota">South Dakota</option>
+                                <option value="Tennessee">Tennessee</option>
+                                <option value="Texas">Texas</option>
+                                <option value="Utah">Utah</option>
+                                <option value="Vermont">Vermont</option>
+                                <option value="Virginia">Virginia</option>
+                                <option value="Washington">Washington</option>
+                                <option value="West Virginia">West Virginia</option>
+                                <option value="Wisconsin">Wisconsin</option>
+                                <option value="Wyoming">Wyoming</option>
+                                <option value="District of Columbia">District of Columbia</option>
+                            </select>
+                        </div>
+
+                        <!-- Canadian Provinces Dropdown - Hidden by default -->
+                        <div id="provinceDropdown" class="form-group" style="margin-bottom: 30px; display: none;">
+                            <label for="provinceSelect">Province/Territory</label>
+                            <select id="provinceSelect" name="State" style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 16px; background: white; transition: border-color 0.3s ease;">
+                                <option value="">Select Province/Territory</option>
+                                <option value="Alberta">Alberta</option>
+                                <option value="British Columbia">British Columbia</option>
+                                <option value="Manitoba">Manitoba</option>
+                                <option value="New Brunswick">New Brunswick</option>
+                                <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
+                                <option value="Northwest Territories">Northwest Territories</option>
+                                <option value="Nova Scotia">Nova Scotia</option>
+                                <option value="Nunavut">Nunavut</option>
+                                <option value="Ontario">Ontario</option>
+                                <option value="Prince Edward Island">Prince Edward Island</option>
+                                <option value="Quebec">Quebec</option>
+                                <option value="Saskatchewan">Saskatchewan</option>
+                                <option value="Yukon">Yukon</option>
+                            </select>
+                        </div>
+
+                        <!-- Senegalese Regions Dropdown - Hidden by default -->
+                        <div id="regionDropdown" class="form-group" style="margin-bottom: 30px; display: none;">
+                            <label for="regionSelect">Region</label>
+                            <select id="regionSelect" name="State" style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 6px; font-size: 16px; background: white; transition: border-color 0.3s ease;">
+                                <option value="">Select Region</option>
+                                <option value="Dakar">Dakar</option>
+                                <option value="Diourbel">Diourbel</option>
+                                <option value="Fatick">Fatick</option>
+                                <option value="Kaffrine">Kaffrine</option>
+                                <option value="Kaolack">Kaolack</option>
+                                <option value="Kédougou">Kédougou</option>
+                                <option value="Kolda">Kolda</option>
+                                <option value="Louga">Louga</option>
+                                <option value="Matam">Matam</option>
+                                <option value="Saint-Louis">Saint-Louis</option>
+                                <option value="Sédhiou">Sédhiou</option>
+                                <option value="Tambacounda">Tambacounda</option>
+                                <option value="Thiès">Thiès</option>
+                                <option value="Ziguinchor">Ziguinchor</option>
+                            </select>
+                        </div>
+
+                        <!-- Emergency Contact -->
+                        <h3 style="color: #00A86B; margin-bottom: 30px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-phone"></i> Emergency Contact
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                            <div class="form-group">
+                                <label asp-for="EmergencyContactName">Emergency Contact Name</label>
+                                <input asp-for="EmergencyContactName" />
+                                <span asp-validation-for="EmergencyContactName" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="EmergencyContactPhone">Emergency Contact Phone</label>
+                                <input asp-for="EmergencyContactPhone" />
+                                <span asp-validation-for="EmergencyContactPhone" style="color: #dc3545; font-size: 0.875rem;"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label asp-for="Notes">Additional Notes</label>
+                            <textarea asp-for="Notes" rows="3" placeholder="Any additional information you'd like to share..."></textarea>
+                            <span asp-validation-for="Notes" style="color: #dc3545; font-size: 0.875rem;"></span>
+                        </div>
+
+                        <div style="margin-bottom: 30px;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" id="terms" required style="margin: 0;">
+                                <span>I agree to the <a href="#" style="color: #00A86B;">Terms and Conditions</a> and <a href="#" style="color: #00A86B;">Privacy Policy</a> *</span>
+                            </label>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <button type="submit" class="btn btn-primary btn-lg" style="padding: 15px 40px; font-size: 1.1rem;">
+                                <i class="fas fa-paper-plane"></i> Submit Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <p style="color: #666; font-size: 0.9rem;">
+                    * Required fields. Your application will be reviewed and you'll be notified of the status via email.
+                </p>
+            </div>
+        </div>
+    </section>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        function toggleStateDropdown() {
+            const countrySelect = document.getElementById('countrySelect');
+            const stateDropdown = document.getElementById('stateDropdown');
+            const stateSelect = document.getElementById('stateSelect');
+            const provinceDropdown = document.getElementById('provinceDropdown');
+            const provinceSelect = document.getElementById('provinceSelect');
+            const regionDropdown = document.getElementById('regionDropdown');
+            const regionSelect = document.getElementById('regionSelect');
+            
+            // Hide all dropdowns first
+            stateDropdown.style.display = 'none';
+            provinceDropdown.style.display = 'none';
+            regionDropdown.style.display = 'none';
+            stateSelect.removeAttribute('required');
+            provinceSelect.removeAttribute('required');
+            regionSelect.removeAttribute('required');
+            stateSelect.value = '';
+            provinceSelect.value = '';
+            regionSelect.value = '';
+            
+            // Show appropriate dropdown based on country selection
+            if (countrySelect.value === 'United States') {
+                stateDropdown.style.display = 'block';
+                stateSelect.setAttribute('required', 'required');
+            } else if (countrySelect.value === 'Canada') {
+                provinceDropdown.style.display = 'block';
+                provinceSelect.setAttribute('required', 'required');
+            } else if (countrySelect.value === 'Senegal') {
+                regionDropdown.style.display = 'block';
+                regionSelect.setAttribute('required', 'required');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleStateDropdown();
+        });
+    </script>
+}
+
+<style>
+    @@media (max-width: 768px) {
+        .container > div {
+            max-width: 100% !important;
+        }
+        div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+        .hero-content h1 {
+            font-size: 2.5rem !important;
+        }
+    }
+</style>

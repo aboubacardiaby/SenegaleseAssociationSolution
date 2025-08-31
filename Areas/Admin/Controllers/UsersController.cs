@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using SenegaleseAssociation.Models;
 using SenegaleseAssociation.Data;
+using SenegaleseAssociation.Areas.Admin.Models;
 
 namespace SenegaleseAssociation.Areas.Admin.Controllers
 {
@@ -27,12 +28,12 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var users = _userManager.Users.ToList();
-            var userList = new List<object>();
+            var userList = new List<UserListViewModel>();
 
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userList.Add(new
+                userList.Add(new UserListViewModel
                 {
                     User = user,
                     Roles = roles

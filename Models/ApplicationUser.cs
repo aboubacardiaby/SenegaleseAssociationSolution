@@ -19,6 +19,8 @@ namespace SenegaleseAssociation.Models
         
         public DateTime? LastLoginAt { get; set; }
         
+        public DateTime? LastActivityAt { get; set; }
+        
         public bool IsActive { get; set; } = true;
     }
 }

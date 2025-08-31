@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "Logout Confirmation";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-warning text-white text-center py-4">
+                <i class="fas fa-sign-out-alt fa-3x mb-3"></i>
+                <h4 class="mb-0">Logout Confirmation</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h5 class="mb-3">Are you sure you want to logout?</h5>
+                    <p class="text-muted">
+                        You are currently logged in as <strong>@User.Identity?.Name</strong>
+                    </p>
+                    <p class="text-muted small">
+                        Any unsaved changes will be lost. You will need to login again to access the admin panel.
+                    </p>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-center">
+                    <form asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Yes, Logout
+                        </button>
+                    </form>
+                    
+                    <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary px-4">
+                        <i class="fas fa-times me-2"></i>
+                        Cancel
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer text-center text-muted small">
+                <i class="fas fa-shield-alt me-1"></i>
+                Your session will be completely terminated for security.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        border-radius: 0;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .card-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+    }
+</style>

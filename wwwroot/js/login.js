@@ -32,30 +32,13 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordInput.addEventListener('blur', validatePassword);
     }
     
-    // Form submission handling - simplified
+    // Form submission handling - JSON based
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
-            console.log('Form submission attempted');
+            e.preventDefault(); // Always prevent default form submission
+            console.log('Form submission prevented - handling with JavaScript');
             
-            // Basic validation only
-            const email = emailInput ? emailInput.value.trim() : '';
-            const password = passwordInput ? passwordInput.value.trim() : '';
-            
-            if (!email || !password) {
-                e.preventDefault();
-                console.log('Form prevented - missing email or password');
-                alert('Please enter both email and password');
-                return false;
-            }
-            
-            // Add loading state
-            if (loginBtn) {
-                loginBtn.classList.add('loading');
-                loginBtn.disabled = true;
-            }
-            
-            console.log('Form submitted successfully');
-            // Allow form to submit
+            submitLoginForm();
         });
     }
     
@@ -92,6 +75,100 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+async function submitLoginForm() {
+    const emailInput = document.querySelector('input[name="Email"]');
+    const passwordInput = document.querySelector('input[name="Password"]');
+    const rememberMeInput = document.querySelector('input[name="RememberMe"]');
+    const button = document.getElementById('loginBtn');
+    
+    // Get form data
+    const loginData = {
+        Email: emailInput ? emailInput.value : '',
+        Password: passwordInput ? passwordInput.value : '',
+        RememberMe: rememberMeInput ? rememberMeInput.checked : false
+    };
+    
+    console.log('Submitting login data:', {
+        Email: loginData.Email,
+        Password: loginData.Password ? '[PRESENT]' : '[EMPTY]',
+        RememberMe: loginData.RememberMe
+    });
+    
+    // Disable button during submission
+    if (button) {
+        button.disabled = true;
+        button.textContent = 'Signing In...';
+    }
+    
+    try {
+        const response = await fetch('@Url.Action("Login", "Account", new { Area = "Admin" })', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(loginData)
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Response received:', result);
+            
+            if (result.success) {
+                console.log('Login successful, redirecting to:', result.redirectUrl);
+                window.location.href = result.redirectUrl || '/Admin/Dashboard';
+            } else {
+                console.error('Login failed:', result.message);
+                showError(result.message || 'Login failed. Please check your credentials.');
+                
+                // Show validation errors if present
+                if (result.errors && result.errors.length > 0) {
+                    showError(result.errors.join(', '));
+                }
+            }
+        } else {
+            try {
+                const errorResult = await response.json();
+                console.error('Login failed:', errorResult);
+                showError(errorResult.message || 'Login failed. Please check your credentials.');
+            } catch (e) {
+                const errorText = await response.text();
+                console.error('Login failed (non-JSON):', errorText);
+                showError('Login failed. Please check your credentials.');
+            }
+        }
+        
+    } catch (error) {
+        console.error('Network error:', error);
+        showError('Network error. Please try again.');
+    } finally {
+        // Re-enable button
+        if (button) {
+            button.disabled = false;
+            button.textContent = 'Sign In';
+        }
+    }
+}
+
+function showError(message) {
+    // Create or update error display
+    let errorDiv = document.querySelector('.alert-danger');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger alert-modern';
+        errorDiv.setAttribute('role', 'alert');
+        
+        const form = document.getElementById('loginForm');
+        if (form) {
+            form.insertBefore(errorDiv, form.firstChild);
+        }
+    }
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
 
 function validateEmail() {
     const email = document.querySelector('input[name="Email"]').value;

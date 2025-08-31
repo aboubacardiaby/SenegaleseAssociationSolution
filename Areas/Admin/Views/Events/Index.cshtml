@@ -39,7 +39,7 @@
                                 <td>@item.Time</td>
                                 <td>@item.Location</td>
                                 <td>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
                                     <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">

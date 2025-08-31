@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Registration Successful";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main id="main" style="padding-top: 100px;">
+    <section class="container">
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <div style="margin-bottom: 40px;">
+                <i class="fas fa-check-circle" style="font-size: 5rem; color: #00A86B;"></i>
+            </div>
+            
+            <h1 style="font-size: 3.5rem; font-weight: 700; color: #00A86B; margin-bottom: 20px;">Thank You!</h1>
+            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 50px;">Your membership application has been submitted successfully.</h2>
+            
+            <div style="background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); padding: 40px; margin-bottom: 40px;">
+                <h3 style="color: #00A86B; margin-bottom: 30px; font-size: 1.8rem;">What happens next?</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px;">
+                    <div>
+                        <div style="color: #00A86B; margin-bottom: 15px;">
+                            <i class="fas fa-envelope" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h4 style="color: #333; margin-bottom: 10px; font-size: 1.2rem;">Review Process</h4>
+                        <p style="color: #666; font-size: 0.95rem; line-height: 1.5;">Our team will review your application within 3-5 business days.</p>
+                    </div>
+                    <div>
+                        <div style="color: #00A86B; margin-bottom: 15px;">
+                            <i class="fas fa-user-check" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h4 style="color: #333; margin-bottom: 10px; font-size: 1.2rem;">Approval</h4>
+                        <p style="color: #666; font-size: 0.95rem; line-height: 1.5;">You'll receive an email notification once your membership is approved.</p>
+                    </div>
+                    <div>
+                        <div style="color: #00A86B; margin-bottom: 15px;">
+                            <i class="fas fa-users" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h4 style="color: #333; margin-bottom: 10px; font-size: 1.2rem;">Welcome</h4>
+                        <p style="color: #666; font-size: 0.95rem; line-height: 1.5;">Join our community events and activities as an active member.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-success" style="margin-bottom: 40px;">
+                <i class="fas fa-info-circle"></i>
+                <strong>Important:</strong> Please keep an eye on your email (including spam folder) for updates on your membership status.
+            </div>
+            
+            <div>
+                <a href="@Url.Action("Index", "Home")" class="btn btn-primary" style="margin-right: 20px; padding: 12px 30px;">
+                    <i class="fas fa-home"></i> Return to Home
+                </a>
+                <a href="@Url.Action("Events", "Home")" class="btn btn-outline" style="padding: 12px 30px;">
+                    <i class="fas fa-calendar"></i> View Events
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+    @@media (max-width: 768px) {
+        .container > div {
+            max-width: 100% !important;
+        }
+        div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+        h1 {
+            font-size: 2.5rem !important;
+        }
+        h2 {
+            font-size: 1.3rem !important;
+        }
+    }
+</style>
