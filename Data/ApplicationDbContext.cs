@@ -17,6 +17,7 @@ namespace SenegaleseAssociation.Data
         public DbSet<Testimonial> Testimonials { get; set; }
         public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<Member> Members { get; set; }
+        public DbSet<Donation> Donations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -126,10 +127,35 @@ namespace SenegaleseAssociation.Data
                 entity.HasIndex(m => m.MembershipStatus);
                 entity.HasIndex(m => m.RegistrationDate);
                 entity.HasIndex(m => m.IsActive);
-                
+
                 entity.HasOne(m => m.ApprovedBy)
                       .WithMany()
                       .HasForeignKey(m => m.ApprovedById)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Donation configuration
+            modelBuilder.Entity<Donation>(entity =>
+            {
+                entity.HasKey(d => d.Id);
+                entity.Property(d => d.Amount).IsRequired().HasColumnType("decimal(18,2)");
+                entity.Property(d => d.Frequency).IsRequired().HasMaxLength(20);
+                entity.Property(d => d.PaymentMethod).IsRequired().HasMaxLength(50);
+                entity.Property(d => d.DonorName).HasMaxLength(100);
+                entity.Property(d => d.DonorEmail).HasMaxLength(255);
+                entity.Property(d => d.DonorPhone).HasMaxLength(20);
+                entity.Property(d => d.Message).HasMaxLength(500);
+                entity.Property(d => d.Status).IsRequired().HasMaxLength(20);
+                entity.Property(d => d.TransactionId).HasMaxLength(100);
+                entity.Property(d => d.Notes).HasMaxLength(500);
+                entity.HasIndex(d => d.Status);
+                entity.HasIndex(d => d.CreatedAt);
+                entity.HasIndex(d => d.PaymentMethod);
+                entity.HasIndex(d => d.Frequency);
+
+                entity.HasOne(d => d.ProcessedBy)
+                      .WithMany()
+                      .HasForeignKey(d => d.ProcessedById)
                       .OnDelete(DeleteBehavior.SetNull);
             });
         }

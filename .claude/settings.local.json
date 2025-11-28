@@ -15,7 +15,11 @@
       "Bash(libman restore:*)",
       "Bash(taskkill:*)",
       "Bash(powershell:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(dotnet tool restore:*)",
+      "Bash(dotnet tool list:*)",
+      "Bash(dotnet nuget:*)",
+      "Bash(export PATH=\"$PATH:/Users/aboudiaby/.dotnet/tools\")"
     ],
     "deny": [],
     "ask": []
