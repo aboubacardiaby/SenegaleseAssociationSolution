@@ -1,0 +1,274 @@
+@model SenegaleseAssociation.Models.Donation
+@{
+    ViewData["Title"] = "Donation Successful";
+}
+
+<section class="hero-small">
+    <div class="container">
+        <h1>Thank You for Your Donation!</h1>
+        <p class="hero-subtitle">Your generous contribution helps strengthen our community.</p>
+    </div>
+</section>
+
+<section class="success-page">
+    <div class="container">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            <h2>Payment @Model.Status</h2>
+
+            @if (Model.Status == "Completed")
+            {
+                <p class="success-message">Your donation has been successfully processed!</p>
+            }
+            else if (Model.Status == "Pending")
+            {
+                <p class="success-message">Your donation has been recorded and is pending confirmation.</p>
+            }
+            else
+            {
+                <p class="error-message">There was an issue with your donation. Please contact us for assistance.</p>
+            }
+
+            <div class="donation-details">
+                <h3>Donation Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Transaction ID:</span>
+                    <span class="detail-value">@Model.TransactionId</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount:</span>
+                    <span class="detail-value">$@Model.Amount.ToString("N2")</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Frequency:</span>
+                    <span class="detail-value">@Model.Frequency</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Payment Method:</span>
+                    <span class="detail-value">@Model.PaymentMethod</span>
+                </div>
+                @if (!Model.IsAnonymous)
+                {
+                    <div class="detail-row">
+                        <span class="detail-label">Donor Name:</span>
+                        <span class="detail-value">@Model.DonorName</span>
+                    </div>
+                }
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">@Model.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Message))
+            {
+                <div class="donation-message">
+                    <h4>Your Message:</h4>
+                    <p>@Model.Message</p>
+                </div>
+            }
+
+            <div class="success-actions">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Return to Home
+                </a>
+                <a asp-controller="Donate" asp-action="Index" class="btn btn-outline">
+                    <i class="fas fa-heart"></i> Make Another Donation
+                </a>
+            </div>
+
+            <div class="receipt-info">
+                <p><i class="fas fa-info-circle"></i> A receipt for your donation has been sent to <strong>@Model.DonorEmail</strong></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <style>
+        .hero-small {
+            background: linear-gradient(135deg, #00A86B 0%, #228B22 50%, #FFD700 100%);
+            color: white;
+            padding: 120px 0 60px;
+            text-align: center;
+        }
+
+        .hero-small h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .success-page {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .success-card {
+            background: white;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 4rem 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: #00A86B;
+            margin-bottom: 2rem;
+        }
+
+        .success-card h2 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            color: #00A86B;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            font-weight: 500;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            font-weight: 500;
+        }
+
+        .donation-details {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .donation-details h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .donation-message {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .donation-message h4 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+        }
+
+        .donation-message p {
+            color: #856404;
+            margin: 0;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00A86B 0%, #228B22 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 168, 107, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00A86B;
+            color: #00A86B;
+        }
+
+        .btn-outline:hover {
+            background: #00A86B;
+            color: white;
+        }
+
+        .receipt-info {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .receipt-info i {
+            color: #00A86B;
+            margin-right: 0.5rem;
+        }
+
+        @@media (max-width: 768px) {
+            .hero-small h1 {
+                font-size: 2.5rem;
+            }
+
+            .success-card {
+                padding: 3rem 2rem;
+            }
+
+            .success-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+}

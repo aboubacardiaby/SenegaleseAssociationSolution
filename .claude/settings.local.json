@@ -19,7 +19,8 @@
       "Bash(dotnet tool restore:*)",
       "Bash(dotnet tool list:*)",
       "Bash(dotnet nuget:*)",
-      "Bash(export PATH=\"$PATH:/Users/aboudiaby/.dotnet/tools\")"
+      "Bash(export PATH=\"$PATH:/Users/aboudiaby/.dotnet/tools\")",
+      "Bash(dotnet add package:*)"
     ],
     "deny": [],
     "ask": []

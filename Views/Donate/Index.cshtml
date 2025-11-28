@@ -641,12 +641,14 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Show success message with transaction ID
-                        alert(`Thank you for your donation!\n\nTransaction ID: ${data.transactionId}\n\n${data.message}\n\nPlease use the payment information shown below to complete your ${frequency} donation of $${amount} via ${method}.`);
-
-                        // For PayPal, could redirect to PayPal
-                        if (method === 'paypal') {
-                            // window.location.href = 'your-paypal-url';
+                        // Check if this is a PayPal payment
+                        if (data.isPayPal && data.approvalUrl) {
+                            // Redirect to PayPal for payment
+                            alert(`Redirecting to PayPal to complete your donation...\n\nTransaction ID: ${data.transactionId}`);
+                            window.location.href = data.approvalUrl;
+                        } else {
+                            // For other payment methods, show payment information
+                            alert(`Thank you for your donation!\n\nTransaction ID: ${data.transactionId}\n\n${data.message}\n\nPlease use the payment information shown below to complete your ${frequency} donation of $${amount} via ${method}.`);
                         }
                     } else {
                         alert('Error: ' + data.message);

@@ -1,5 +1,6 @@
 using SenegaleseAssociation.Data;
 using SenegaleseAssociation.Models;
+using SenegaleseAssociation.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -72,6 +73,9 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add PayPal Service
+builder.Services.AddScoped<PayPalService>();
 
 // Add Razor runtime compilation for development
 if (builder.Environment.IsDevelopment())
