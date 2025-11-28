@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: nimble-valve-479420-p2
+  PROJECT_ID: senweb001
   REGION: us-central1
   SERVICE_NAME: senegalese-association
   ARTIFACT_REGISTRY: senregistry
