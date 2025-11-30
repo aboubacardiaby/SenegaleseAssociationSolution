@@ -9,11 +9,13 @@ namespace SenegaleseAssociation.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly PayPalService _payPalService;
+        private readonly StripeService _stripeService;
 
-        public DonateController(ApplicationDbContext context, PayPalService payPalService)
+        public DonateController(ApplicationDbContext context, PayPalService payPalService, StripeService stripeService)
         {
             _context = context;
             _payPalService = payPalService;
+            _stripeService = stripeService;
         }
 
         public IActionResult Index()
@@ -54,8 +56,8 @@ namespace SenegaleseAssociation.Controllers
                         return Json(new
                         {
                             success = true,
-                            isPayPal = true,
-                            approvalUrl = approvalUrl,
+                            redirectUrl = approvalUrl,
+                            paymentProvider = "PayPal",
                             message = "Redirecting to PayPal...",
                             transactionId = donation.TransactionId,
                             donationId = donation.Id
@@ -76,11 +78,47 @@ namespace SenegaleseAssociation.Controllers
                     }
                 }
 
-                // For other payment methods (Zelle, Venmo, ACH)
+                // Handle ACH payment through Stripe
+                if (donation.PaymentMethod.ToLower() == "ach")
+                {
+                    try
+                    {
+                        var successUrl = $"{Request.Scheme}://{Request.Host}/Donate/StripeSuccess";
+                        var cancelUrl = $"{Request.Scheme}://{Request.Host}/Donate/StripeCancel";
+
+                        var checkoutUrl = await _stripeService.CreateACHCheckoutSession(donation, successUrl, cancelUrl);
+
+                        return Json(new
+                        {
+                            success = true,
+                            redirectUrl = checkoutUrl,
+                            paymentProvider = "Stripe",
+                            message = "Redirecting to secure payment...",
+                            transactionId = donation.TransactionId,
+                            donationId = donation.Id
+                        });
+                    }
+                    catch (Exception stripeEx)
+                    {
+                        // Log Stripe error
+                        donation.Status = "Failed";
+                        donation.Notes = $"Stripe error: {stripeEx.Message}";
+                        _context.SaveChanges();
+
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Failed to create ACH payment. Please try again or use another payment method."
+                        });
+                    }
+                }
+
+                // For other payment methods (Zelle, Venmo)
                 return Json(new
                 {
                     success = true,
-                    isPayPal = false,
+                    redirectUrl = (string?)null,
+                    paymentProvider = donation.PaymentMethod,
                     message = "Thank you for your donation! Your transaction has been recorded.",
                     transactionId = donation.TransactionId,
                     donationId = donation.Id
@@ -145,6 +183,81 @@ namespace SenegaleseAssociation.Controllers
             {
                 donation.Status = "Cancelled";
                 donation.Notes = "Payment cancelled by user";
+                _context.SaveChanges();
+            }
+
+            TempData["Error"] = "Payment was cancelled. You can try again if you'd like.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> StripeSuccess(string session_id, int donationId)
+        {
+            try
+            {
+                var donation = _context.Donations.Find(donationId);
+                if (donation == null)
+                {
+                    TempData["Error"] = "Donation not found.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Verify the session
+                var session = await _stripeService.GetSession(session_id);
+
+                if (session.PaymentStatus == "paid" || session.Status == "complete")
+                {
+                    donation.Status = "Completed";
+                    donation.ProcessedDate = DateTime.UtcNow;
+                    donation.Notes = $"Stripe Session ID: {session_id}";
+
+                    // If it's a recurring donation, set up the subscription
+                    if (donation.Frequency == "Monthly" || donation.Frequency == "Annual")
+                    {
+                        if (!string.IsNullOrEmpty(session.SetupIntentId))
+                        {
+                            var recurringSuccess = await _stripeService.CreateRecurringPayment(
+                                session.SetupIntentId,
+                                donation.Id,
+                                donation.Amount,
+                                donation.Frequency
+                            );
+
+                            if (recurringSuccess)
+                            {
+                                donation.Notes += " | Recurring payment setup successful";
+                            }
+                        }
+                    }
+
+                    _context.SaveChanges();
+
+                    TempData["Success"] = $"Thank you for your donation! Your payment has been processed successfully. Transaction ID: {donation.TransactionId}";
+                }
+                else
+                {
+                    donation.Status = "Pending";
+                    donation.Notes = $"Stripe payment pending - Session ID: {session_id}";
+                    _context.SaveChanges();
+
+                    TempData["Success"] = "Your donation is being processed. You'll receive a confirmation email once it's complete.";
+                }
+
+                return View("Success", donation);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred processing your payment.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        public IActionResult StripeCancel(int donationId)
+        {
+            var donation = _context.Donations.Find(donationId);
+            if (donation != null)
+            {
+                donation.Status = "Cancelled";
+                donation.Notes = "Stripe payment cancelled by user";
                 _context.SaveChanges();
             }
 

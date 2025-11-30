@@ -74,8 +74,9 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add PayPal Service
+// Add Payment Services
 builder.Services.AddScoped<PayPalService>();
+builder.Services.AddScoped<StripeService>();
 
 // Add Razor runtime compilation for development
 if (builder.Environment.IsDevelopment())

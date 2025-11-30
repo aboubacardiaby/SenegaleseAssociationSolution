@@ -641,13 +641,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Check if this is a PayPal payment
-                        if (data.isPayPal && data.approvalUrl) {
-                            // Redirect to PayPal for payment
-                            alert(`Redirecting to PayPal to complete your donation...\n\nTransaction ID: ${data.transactionId}`);
-                            window.location.href = data.approvalUrl;
+                        // Check if payment requires redirect (PayPal or Stripe)
+                        if (data.redirectUrl) {
+                            // Redirect to payment provider (PayPal or Stripe)
+                            alert(`Redirecting to ${data.paymentProvider} to complete your donation...\n\nTransaction ID: ${data.transactionId}`);
+                            window.location.href = data.redirectUrl;
                         } else {
-                            // For other payment methods, show payment information
+                            // For other payment methods (Zelle, Venmo), show payment information
                             alert(`Thank you for your donation!\n\nTransaction ID: ${data.transactionId}\n\n${data.message}\n\nPlease use the payment information shown below to complete your ${frequency} donation of $${amount} via ${method}.`);
                         }
                     } else {
