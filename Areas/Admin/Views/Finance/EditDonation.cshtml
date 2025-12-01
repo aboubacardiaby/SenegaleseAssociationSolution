@@ -1,0 +1,215 @@
+@model SenegaleseAssociation.Models.Donation
+@{
+    ViewData["Title"] = "Edit Donation";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-edit text-primary"></i> Edit Donation
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Donations" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-info-circle"></i> Donation Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="EditDonation" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CreatedAt" />
+                    <input type="hidden" asp-for="ProcessedById" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Amount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input asp-for="Amount" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Frequency" class="form-label">Frequency</label>
+                            <select asp-for="Frequency" class="form-select">
+                                <option value="OneTime">One Time</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Annual">Annual</option>
+                            </select>
+                            <span asp-validation-for="Frequency" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="PaymentMethod" class="form-label">Payment Method</label>
+                            <select asp-for="PaymentMethod" class="form-select">
+                                <option value="PayPal">PayPal</option>
+                                <option value="Stripe">Stripe</option>
+                                <option value="ACH">ACH</option>
+                                <option value="Zelle">Zelle</option>
+                                <option value="Venmo">Venmo</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Check">Check</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label">Status</label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Pending">Pending</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Failed">Failed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label asp-for="TransactionId" class="form-label">Transaction ID</label>
+                            <input asp-for="TransactionId" class="form-control" />
+                            <span asp-validation-for="TransactionId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h6 class="text-muted mb-3">Donor Information</h6>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                <input asp-for="IsAnonymous" class="form-check-input" type="checkbox" id="isAnonymous" />
+                                <label class="form-check-label" for="isAnonymous">
+                                    Anonymous Donation
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="donorFields">
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label asp-for="DonorName" class="form-label">Donor Name</label>
+                                <input asp-for="DonorName" class="form-control" />
+                                <span asp-validation-for="DonorName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="DonorEmail" class="form-label">Email</label>
+                                <input asp-for="DonorEmail" class="form-control" type="email" />
+                                <span asp-validation-for="DonorEmail" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DonorPhone" class="form-label">Phone</label>
+                                <input asp-for="DonorPhone" class="form-control" type="tel" />
+                                <span asp-validation-for="DonorPhone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label asp-for="Message" class="form-label">Message</label>
+                                <textarea asp-for="Message" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Message" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label asp-for="Notes" class="form-label">Internal Notes</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                            <small class="text-muted">These notes are for internal use only and not visible to the donor.</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="ProcessedDate" class="form-label">Processed Date</label>
+                            <input asp-for="ProcessedDate" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="ProcessedDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Donations" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow mb-4 bg-light">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-info-circle"></i> Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="small mb-2"><strong>Created:</strong> @Model.CreatedAt.ToString("MMM dd, yyyy h:mm tt")</p>
+                <p class="small mb-0"><strong>Last Updated:</strong> @Model.UpdatedAt.ToString("MMM dd, yyyy h:mm tt")</p>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4 bg-info text-white">
+            <div class="card-body">
+                <h6 class="text-white"><i class="fas fa-lightbulb"></i> Tips</h6>
+                <ul class="small mb-0 ps-3">
+                    <li>Mark as "Completed" once payment is verified</li>
+                    <li>Use internal notes to track any special circumstances</li>
+                    <li>Transaction ID should match your payment processor</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Toggle donor fields based on anonymous checkbox
+        const isAnonymousCheckbox = document.getElementById('isAnonymous');
+        const donorFields = document.getElementById('donorFields');
+
+        function toggleDonorFields() {
+            if (isAnonymousCheckbox.checked) {
+                donorFields.style.opacity = '0.5';
+                donorFields.querySelectorAll('input, textarea').forEach(field => {
+                    field.disabled = true;
+                });
+            } else {
+                donorFields.style.opacity = '1';
+                donorFields.querySelectorAll('input, textarea').forEach(field => {
+                    field.disabled = false;
+                });
+            }
+        }
+
+        isAnonymousCheckbox.addEventListener('change', toggleDonorFields);
+        toggleDonorFields(); // Initialize on page load
+    </script>
+}

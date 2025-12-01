@@ -2,7 +2,9 @@
 @{
     ViewData["Title"] = "Donations Management";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-}
+    var statusFilter = ViewBag.StatusFilter as string ?? "All";
+    var startDate = ViewBag.StartDate as DateTime?;
+    var endDate = ViewBag.EndDate as DateTime?;
 }
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -11,13 +13,59 @@
     </h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-download"></i> Export
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">
+            <a asp-action="ExportDonations" asp-route-status="@statusFilter"
+               asp-route-startDate="@startDate" asp-route-endDate="@endDate"
+               class="btn btn-sm btn-success">
+                <i class="fas fa-download"></i> Export CSV
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
                 <i class="fas fa-print"></i> Print
             </button>
         </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-filter"></i> Filters
+        </h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="Donations" method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="All" selected="@(statusFilter == "All")">All</option>
+                    <option value="Pending" selected="@(statusFilter == "Pending")">Pending</option>
+                    <option value="Completed" selected="@(statusFilter == "Completed")">Completed</option>
+                    <option value="Failed" selected="@(statusFilter == "Failed")">Failed</option>
+                    <option value="Cancelled" selected="@(statusFilter == "Cancelled")">Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="startDate" class="form-label">Start Date</label>
+                <input type="date" name="startDate" id="startDate" class="form-control"
+                       value="@(startDate?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-3">
+                <label for="endDate" class="form-label">End Date</label>
+                <input type="date" name="endDate" id="endDate" class="form-control"
+                       value="@(endDate?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                    <a asp-action="Donations" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset
+                    </a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -90,20 +138,14 @@
 
 <!-- Donations Table -->
 <div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">
             <i class="fas fa-list"></i> All Donations
+            @if (Model != null && Model.Any())
+            {
+                <span class="badge bg-primary">@Model.Count</span>
+            }
         </h6>
-        <div class="dropdown">
-            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-filter"></i> Filter
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">All Donations</a></li>
-                <li><a class="dropdown-item" href="#">Completed Only</a></li>
-                <li><a class="dropdown-item" href="#">Pending Only</a></li>
-            </ul>
-        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -120,8 +162,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var donation in Model)
+                    @if (Model != null)
                     {
+                        @foreach (var donation in Model)
+                        {
                         <tr class="fade-in searchable-item">
                             <td class="fw-bold">@donation.DonorName</td>
                             <td>
@@ -160,30 +204,39 @@
                                 }
                             </td>
                             <td>
-                                <div class="action-buttons">
+                                <div class="action-buttons d-flex gap-1">
+                                    <a asp-action="DonationDetails" asp-route-id="@donation.Id"
+                                       class="btn btn-info btn-sm"
+                                       data-bs-toggle="tooltip" title="View details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a asp-action="EditDonation" asp-route-id="@donation.Id"
+                                       class="btn btn-primary btn-sm"
+                                       data-bs-toggle="tooltip" title="Edit donation">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     @if (donation.Status == "Pending")
                                     {
                                         <form asp-action="ApproveDonation" method="post" class="d-inline">
                                             <input type="hidden" name="id" value="@donation.Id" />
-                                            <button type="submit" class="btn btn-success btn-sm" 
+                                            <button type="submit" class="btn btn-success btn-sm"
                                                     data-bs-toggle="tooltip" title="Approve donation">
                                                 <i class="fas fa-check"></i>
                                             </button>
                                         </form>
                                     }
-                                    <button type="button" class="btn btn-info btn-sm" 
-                                            data-bs-toggle="modal" data-bs-target="#viewModal@(donation.Id)"
-                                            data-bs-toggle="tooltip" title="View details">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-delete" 
-                                            data-item-name="@donation.DonorName's donation"
-                                            data-bs-toggle="tooltip" title="Delete donation">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    <form asp-action="DeleteDonation" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@donation.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Are you sure you want to delete this donation from @donation.DonorName?');"
+                                                data-bs-toggle="tooltip" title="Delete donation">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
+                        }
                     }
                 </tbody>
             </table>
@@ -191,90 +244,16 @@
     </div>
 </div>
 
-<!-- View Modals -->
-@foreach (var donation in Model)
-{
-    <div class="modal fade" id="viewModal@(donation.Id)" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-heart text-success"></i> Donation Details
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Donor Information</h6>
-                            <table class="table table-sm">
-                                <tr>
-                                    <td><strong>Name:</strong></td>
-                                    <td>@donation.DonorName</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Email:</strong></td>
-                                    <td>@(string.IsNullOrEmpty(donation.Email) ? "Not provided" : donation.Email)</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-muted">Donation Information</h6>
-                            <table class="table table-sm">
-                                <tr>
-                                    <td><strong>Amount:</strong></td>
-                                    <td class="text-success fw-bold">$@donation.Amount.ToString("N2")</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Purpose:</strong></td>
-                                    <td>@donation.Purpose</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Date:</strong></td>
-                                    <td>@donation.Date.ToString("MMMM dd, yyyy")</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Status:</strong></td>
-                                    <td>
-                                        @if (donation.Status == "Completed")
-                                        {
-                                            <span class="badge bg-success">Completed</span>
-                                        }
-                                        else if (donation.Status == "Pending")
-                                        {
-                                            <span class="badge bg-warning">Pending</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">@donation.Status</span>
-                                        }
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    @if (donation.Status == "Pending")
-                    {
-                        <form asp-action="ApproveDonation" method="post" class="me-2">
-                            <input type="hidden" name="id" value="@donation.Id" />
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-check"></i> Approve Donation
-                            </button>
-                        </form>
-                    }
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
 @section Scripts {
     <script>
         // Initialize DataTable with custom options
         $(document).ready(function() {
+            // Check if DataTable already exists and destroy it
+            if ($.fn.DataTable.isDataTable('.data-table')) {
+                $('.data-table').DataTable().destroy();
+            }
+
+            // Initialize DataTable
             $('.data-table').DataTable({
                 order: [[4, 'desc']], // Sort by date descending
                 columnDefs: [

@@ -20,7 +20,9 @@
       "Bash(dotnet tool list:*)",
       "Bash(dotnet nuget:*)",
       "Bash(export PATH=\"$PATH:/Users/aboudiaby/.dotnet/tools\")",
-      "Bash(dotnet add package:*)"
+      "Bash(dotnet add package:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)"
     ],
     "deny": [],
     "ask": []

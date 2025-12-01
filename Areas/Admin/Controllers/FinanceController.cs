@@ -2,6 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using SenegaleseAssociation.Constants;
 using Microsoft.AspNetCore.Authorization;
 using SenegaleseAssociation.Areas.Admin.Models;
+using SenegaleseAssociation.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Text;
+using SenegaleseAssociation.Models;
 
 namespace SenegaleseAssociation.Areas.Admin.Controllers
 {
@@ -9,6 +13,12 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
     [Authorize(Roles = $"{Roles.Admin},{Roles.Finance}")]
     public class FinanceController : Controller
     {
+        private readonly ApplicationDbContext _context;
+
+        public FinanceController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
         public IActionResult Index()
         {
             // Sample financial data - in a real app this would come from database
@@ -32,17 +42,44 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
             return View(model);
         }
 
-        public IActionResult Donations()
+        public async Task<IActionResult> Donations(string status = "All", DateTime? startDate = null, DateTime? endDate = null)
         {
-            // Sample donation data
-            var donations = new List<DonationViewModel>
+            var query = _context.Donations.AsQueryable();
+
+            // Filter by status
+            if (!string.IsNullOrEmpty(status) && status != "All")
             {
-                new() { Id = 1, DonorName = "Ahmed Family", Email = "ahmed@email.com", Amount = 500.00m, Date = DateTime.Now.AddDays(-1), Status = "Completed", Purpose = "General Fund" },
-                new() { Id = 2, DonorName = "Fatima Diop", Email = "fatima@email.com", Amount = 250.00m, Date = DateTime.Now.AddDays(-3), Status = "Pending", Purpose = "Youth Programs" },
-                new() { Id = 3, DonorName = "Anonymous", Email = "", Amount = 1000.00m, Date = DateTime.Now.AddDays(-5), Status = "Completed", Purpose = "Emergency Fund" },
-                new() { Id = 4, DonorName = "Mamadou Ba", Email = "mamadou@email.com", Amount = 150.00m, Date = DateTime.Now.AddDays(-7), Status = "Completed", Purpose = "Cultural Events" }
-            };
-            
+                query = query.Where(d => d.Status == status);
+            }
+
+            // Filter by date range
+            if (startDate.HasValue)
+            {
+                query = query.Where(d => d.CreatedAt >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                query = query.Where(d => d.CreatedAt <= endDate.Value.AddDays(1));
+            }
+
+            var donations = await query
+                .OrderByDescending(d => d.CreatedAt)
+                .Select(d => new DonationViewModel
+                {
+                    Id = d.Id,
+                    DonorName = d.IsAnonymous ? "Anonymous" : d.DonorName,
+                    Email = d.DonorEmail,
+                    Amount = d.Amount,
+                    Date = d.CreatedAt,
+                    Status = d.Status,
+                    Purpose = d.Frequency // Using Frequency as Purpose for now
+                })
+                .ToListAsync();
+
+            ViewBag.StatusFilter = status;
+            ViewBag.StartDate = startDate;
+            ViewBag.EndDate = endDate;
+
             return View(donations);
         }
 
@@ -80,12 +117,190 @@ namespace SenegaleseAssociation.Areas.Admin.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public IActionResult ApproveDonation(int id)
+        public async Task<IActionResult> DonationDetails(int id)
         {
-            // In a real app, update the database
+            var donation = await _context.Donations
+                .Include(d => d.ProcessedBy)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
+            if (donation == null)
+            {
+                TempData["Error"] = "Donation not found.";
+                return RedirectToAction(nameof(Donations));
+            }
+
+            return View(donation);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditDonation(int id)
+        {
+            var donation = await _context.Donations.FindAsync(id);
+            if (donation == null)
+            {
+                TempData["Error"] = "Donation not found.";
+                return RedirectToAction(nameof(Donations));
+            }
+
+            return View(donation);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditDonation(int id, Donation donation)
+        {
+            if (id != donation.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    donation.UpdatedAt = DateTime.UtcNow;
+                    _context.Update(donation);
+                    await _context.SaveChangesAsync();
+
+                    TempData["Success"] = "Donation updated successfully.";
+                    return RedirectToAction(nameof(Donations));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!DonationExists(donation.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return View(donation);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteDonation(int id)
+        {
+            var donation = await _context.Donations.FindAsync(id);
+            if (donation == null)
+            {
+                TempData["Error"] = "Donation not found.";
+                return RedirectToAction(nameof(Donations));
+            }
+
+            _context.Donations.Remove(donation);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Donation deleted successfully.";
+            return RedirectToAction(nameof(Donations));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveDonation(int id)
+        {
+            var donation = await _context.Donations.FindAsync(id);
+            if (donation == null)
+            {
+                TempData["Error"] = "Donation not found.";
+                return RedirectToAction(nameof(Donations));
+            }
+
+            donation.Status = "Completed";
+            donation.ProcessedDate = DateTime.UtcNow;
+            donation.UpdatedAt = DateTime.UtcNow;
+
+            // Set the ProcessedById if user is authenticated
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                donation.ProcessedById = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            }
+
+            await _context.SaveChangesAsync();
+
             TempData["Success"] = "Donation approved successfully.";
             return RedirectToAction(nameof(Donations));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateDonationStatus(int id, string status)
+        {
+            var donation = await _context.Donations.FindAsync(id);
+            if (donation == null)
+            {
+                return Json(new { success = false, message = "Donation not found." });
+            }
+
+            donation.Status = status;
+            donation.UpdatedAt = DateTime.UtcNow;
+
+            if (status == "Completed")
+            {
+                donation.ProcessedDate = DateTime.UtcNow;
+                if (User.Identity?.IsAuthenticated == true)
+                {
+                    donation.ProcessedById = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Donation status updated successfully." });
+        }
+
+        public async Task<IActionResult> ExportDonations(string status = "All", DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var query = _context.Donations.AsQueryable();
+
+            // Apply same filters as Donations action
+            if (!string.IsNullOrEmpty(status) && status != "All")
+            {
+                query = query.Where(d => d.Status == status);
+            }
+            if (startDate.HasValue)
+            {
+                query = query.Where(d => d.CreatedAt >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                query = query.Where(d => d.CreatedAt <= endDate.Value.AddDays(1));
+            }
+
+            var donations = await query.OrderByDescending(d => d.CreatedAt).ToListAsync();
+
+            // Create CSV content
+            var csv = new StringBuilder();
+            csv.AppendLine("ID,Donor Name,Email,Phone,Amount,Frequency,Payment Method,Status,Transaction ID,Date,Processed Date,Message,Notes");
+
+            foreach (var donation in donations)
+            {
+                csv.AppendLine($"{donation.Id}," +
+                    $"\"{(donation.IsAnonymous ? "Anonymous" : donation.DonorName)}\"," +
+                    $"\"{donation.DonorEmail}\"," +
+                    $"\"{donation.DonorPhone}\"," +
+                    $"{donation.Amount}," +
+                    $"\"{donation.Frequency}\"," +
+                    $"\"{donation.PaymentMethod}\"," +
+                    $"\"{donation.Status}\"," +
+                    $"\"{donation.TransactionId}\"," +
+                    $"\"{donation.CreatedAt:yyyy-MM-dd HH:mm:ss}\"," +
+                    $"\"{donation.ProcessedDate?.ToString("yyyy-MM-dd HH:mm:ss")}\"," +
+                    $"\"{donation.Message.Replace("\"", "\"\"")}\"," +
+                    $"\"{donation.Notes.Replace("\"", "\"\"")}\"");
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+            return File(bytes, "text/csv", $"donations_{DateTime.UtcNow:yyyyMMddHHmmss}.csv");
+        }
+
+        private bool DonationExists(int id)
+        {
+            return _context.Donations.Any(e => e.Id == id);
         }
 
         [HttpPost]
