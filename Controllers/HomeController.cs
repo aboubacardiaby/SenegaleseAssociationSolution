@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SenegaleseAssociation.Data;
 using SenegaleseAssociation.Models;
+using SenegaleseAssociation.Services;
 using System.Diagnostics;
 
 namespace SenegaleseAssociation.Controllers
@@ -9,10 +10,12 @@ namespace SenegaleseAssociation.Controllers
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public HomeController(ApplicationDbContext context)
+        public HomeController(ApplicationDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
         public IActionResult Index()
         {
@@ -69,13 +72,28 @@ namespace SenegaleseAssociation.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Contact(ContactMessage model)
+        public async Task<IActionResult> Contact(ContactMessage model)
         {
             if (ModelState.IsValid)
             {
                 _context.ContactMessages.Add(model);
                 _context.SaveChanges();
-                
+
+                try
+                {
+                    await _emailService.SendContactNotificationAsync(
+                        model.Name,
+                        model.Email,
+                        model.Subject,
+                        model.Message
+                    );
+                }
+                catch (Exception ex)
+                {
+                    // Log the error but don't show it to the user
+                    Console.WriteLine($"Failed to send email notification: {ex.Message}");
+                }
+
                 TempData["Success"] = "Thank you for your message! We will get back to you soon.";
                 return RedirectToAction(nameof(Contact));
             }
