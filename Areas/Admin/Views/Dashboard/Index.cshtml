@@ -2,128 +2,106 @@
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var greeting = DateTime.Now.Hour < 12 ? "Good morning" : DateTime.Now.Hour < 17 ? "Good afternoon" : "Good evening";
 }
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">
-        <i class="fas fa-tachometer-alt text-success"></i> Dashboard
-    </h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <small class="text-muted">Welcome back, @User.Identity?.Name</small>
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Dashboard</h1>
+        <p class="subtitle">@greeting, @User.Identity?.Name &mdash; @DateTime.Now.ToString("dddd, MMMM d, yyyy")</p>
     </div>
+    @if (User.IsInRole("Admin") || User.IsInRole("Organization"))
+    {
+        <div>
+            <a asp-area="Admin" asp-controller="Events" asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Event
+            </a>
+        </div>
+    }
 </div>
 
 <!-- Stats Cards -->
-<div class="row mb-4">
-    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-        <div class="card border-left-primary stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Total active events in the system">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Total Events</div>
-                        <div class="h5 mb-0 font-weight-bold text-white">@Model.TotalEvents</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-calendar fa-2x text-white opacity-50"></i>
-                    </div>
-                </div>
+<div class="row g-3 mb-4">
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 stat-card-wrapper">
+        <div class="stat-card purple" data-bs-toggle="tooltip" title="Total events in the system">
+            <div class="stat-icon purple"><i class="fas fa-calendar-alt"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Total Events</div>
+                <div class="stat-value">@Model.TotalEvents</div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-        <div class="card border-left-success stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Events scheduled for the future">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Upcoming</div>
-                        <div class="h5 mb-0 font-weight-bold text-white">@Model.UpcomingEvents</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-clock fa-2x text-white opacity-50"></i>
-                    </div>
-                </div>
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 stat-card-wrapper">
+        <div class="stat-card green" data-bs-toggle="tooltip" title="Events scheduled in the future">
+            <div class="stat-icon green"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Upcoming</div>
+                <div class="stat-value">@Model.UpcomingEvents</div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-        <div class="card border-left-info stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Available community services">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Services</div>
-                        <div class="h5 mb-0 font-weight-bold text-white">@Model.TotalServices</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-handshake fa-2x text-white opacity-50"></i>
-                    </div>
-                </div>
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 stat-card-wrapper">
+        <div class="stat-card blue" data-bs-toggle="tooltip" title="Active community services">
+            <div class="stat-icon blue"><i class="fas fa-handshake"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Services</div>
+                <div class="stat-value">@Model.TotalServices</div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-        <div class="card border-left-warning stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Active leadership members">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Leadership</div>
-                        <div class="h5 mb-0 font-weight-bold text-white">@Model.TotalLeadership</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-users fa-2x text-white opacity-50"></i>
-                    </div>
-                </div>
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 stat-card-wrapper">
+        <div class="stat-card amber" data-bs-toggle="tooltip" title="Active leadership members">
+            <div class="stat-icon amber"><i class="fas fa-user-tie"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Leadership</div>
+                <div class="stat-value">@Model.TotalLeadership</div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-        <div class="card border-left-secondary stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Community testimonials">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">Testimonials</div>
-                        <div class="h5 mb-0 font-weight-bold text-white">@Model.TotalTestimonials</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-star fa-2x text-white opacity-50"></i>
-                    </div>
-                </div>
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 stat-card-wrapper">
+        <div class="stat-card teal" data-bs-toggle="tooltip" title="Community testimonials">
+            <div class="stat-icon teal"><i class="fas fa-star"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Testimonials</div>
+                <div class="stat-value">@Model.TotalTestimonials</div>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 mb-3">
-        <div class="card border-left-danger stats-card shadow h-100 py-2" data-bs-toggle="tooltip" title="Unread contact messages">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-white text-uppercase mb-1">New Messages</div>
-                        <div class="h5 mb-0 font-weight-bold text-white">@Model.UnreadMessages</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-envelope fa-2x text-white opacity-50"></i>
-                    </div>
-                </div>
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 stat-card-wrapper">
+        <div class="stat-card rose" data-bs-toggle="tooltip" title="Unread contact messages">
+            <div class="stat-icon rose"><i class="fas fa-envelope"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">New Messages</div>
+                <div class="stat-value">@Model.UnreadMessages</div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <!-- Recent Events -->
+<!-- Content Row -->
+<div class="row g-3 mb-4">
+
+    <!-- Upcoming Events -->
     <div class="col-lg-6">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-calendar-alt"></i> Upcoming Events
-                </h6>
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-header-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6;">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    Upcoming Events
+                </div>
                 @if (User.IsInRole("Admin") || User.IsInRole("Organization"))
                 {
-                    <a asp-area="Admin" asp-controller="Events" asp-action="Index" class="btn btn-sm btn-primary">
-                        View All <i class="fas fa-arrow-right"></i>
+                    <a asp-area="Admin" asp-controller="Events" asp-action="Index"
+                       class="btn btn-sm btn-outline-primary">
+                        View All <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 }
             </div>
@@ -132,27 +110,36 @@
                 {
                     @foreach (var evt in Model.RecentEvents)
                     {
-                        <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                            <div class="flex-shrink-0">
-                                <div class="bg-primary text-white rounded text-center p-2" style="width: 50px;">
-                                    <div class="small">@evt.Date.ToString("MMM")</div>
-                                    <div class="h6 mb-0">@evt.Date.Day</div>
-                                </div>
+                        <div class="dashboard-item">
+                            <div class="item-date-badge">
+                                <span class="month">@evt.Date.ToString("MMM")</span>
+                                <span class="day">@evt.Date.Day</span>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-1">@evt.Title</h6>
-                                <p class="mb-1 text-muted small">@evt.Description</p>
-                                <small class="text-success">
-                                    <i class="fas fa-clock"></i> @evt.Time | 
-                                    <i class="fas fa-map-marker-alt"></i> @evt.Location
-                                </small>
+                            <div class="item-body">
+                                <div class="item-title">@evt.Title</div>
+                                <div class="item-meta">
+                                    <span><i class="fas fa-clock"></i> @evt.Time</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> @evt.Location</span>
+                                </div>
                             </div>
                         </div>
                     }
                 }
                 else
                 {
-                    <p class="text-muted text-center py-3">No upcoming events scheduled.</p>
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-calendar-xmark fa-2x" style="color:#cbd5e1;"></i>
+                        </div>
+                        <p class="text-muted mb-1">No upcoming events</p>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Organization"))
+                        {
+                            <a asp-area="Admin" asp-controller="Events" asp-action="Create"
+                               class="btn btn-sm btn-primary mt-2">
+                                <i class="fas fa-plus me-1"></i> Create Event
+                            </a>
+                        }
+                    </div>
                 }
             </div>
         </div>
@@ -160,46 +147,142 @@
 
     <!-- Recent Messages -->
     <div class="col-lg-6">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-comments"></i> Recent Messages
-                </h6>
+        <div class="card h-100">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-header-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    Recent Messages
+                </div>
                 @if (User.IsInRole("Admin") || User.IsInRole("Organization"))
                 {
-                    <a asp-area="Admin" asp-controller="ContactMessages" asp-action="Index" class="btn btn-sm btn-primary">
-                        View All <i class="fas fa-arrow-right"></i>
+                    <a asp-area="Admin" asp-controller="ContactMessages" asp-action="Index"
+                       class="btn btn-sm btn-outline-primary">
+                        View All <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 }
             </div>
             <div class="card-body">
                 @if (Model.RecentMessages.Any())
                 {
-                    @foreach (var message in Model.RecentMessages)
+                    @foreach (var msg in Model.RecentMessages)
                     {
-                        <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
-                            <div class="flex-shrink-0">
-                                <div class="@(message.IsRead ? "bg-secondary" : "bg-success") text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-user"></i>
-                                </div>
+                        <div class="dashboard-item">
+                            <div class="item-avatar"
+                                 style="background:@(msg.IsRead ? "#94a3b8" : "var(--primary)");">
+                                <i class="fas fa-user"></i>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h6 class="mb-1">@message.Name</h6>
-                                    <small class="text-muted">@message.CreatedAt.ToString("MM/dd/yyyy")</small>
+                            <div class="item-body">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div class="item-title flex-grow-1">
+                                        @msg.Name
+                                        @if (!msg.IsRead)
+                                        {
+                                            <span class="badge bg-primary ms-1" style="font-size:.6rem;vertical-align:middle;">New</span>
+                                        }
+                                    </div>
+                                    <span class="text-muted" style="font-size:.72rem;white-space:nowrap;flex-shrink:0;">
+                                        @msg.CreatedAt.ToString("MM/dd/yyyy")
+                                    </span>
                                 </div>
-                                <p class="mb-1 fw-bold small">@message.Subject</p>
-                                <p class="mb-0 text-muted small">@(message.Message.Length > 80 ? message.Message.Substring(0, 80) + "..." : message.Message)</p>
+                                <div class="item-meta mt-1">
+                                    <span style="font-weight:600;color:var(--text-secondary);">@msg.Subject</span>
+                                </div>
+                                <div class="text-muted" style="font-size:.78rem;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">
+                                    @(msg.Message.Length > 70 ? msg.Message.Substring(0, 70) + "…" : msg.Message)
+                                </div>
                             </div>
                         </div>
                     }
                 }
                 else
                 {
-                    <p class="text-muted text-center py-3">No messages received yet.</p>
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-inbox fa-2x" style="color:#cbd5e1;"></i>
+                        </div>
+                        <p class="text-muted mb-0">No messages yet</p>
+                    </div>
                 }
             </div>
         </div>
     </div>
 </div>
 
+<!-- Quick Actions -->
+<div class="row g-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-header-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    Quick Actions
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    @if (User.IsInRole("Admin") || User.IsInRole("Organization"))
+                    {
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <a asp-area="Admin" asp-controller="Events" asp-action="Create" class="quick-action-card">
+                                <div class="qa-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6;">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <span>New Event</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <a asp-area="Admin" asp-controller="Members" asp-action="Index" class="quick-action-card">
+                                <div class="qa-icon" style="background:rgba(0,168,107,0.1);color:var(--primary);">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <span>View Members</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <a asp-area="Admin" asp-controller="ContactMessages" asp-action="Index" class="quick-action-card">
+                                <div class="qa-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;">
+                                    <i class="fas fa-envelope-open"></i>
+                                </div>
+                                <span>Messages</span>
+                            </a>
+                        </div>
+                    }
+                    @if (User.IsInRole("Admin") || User.IsInRole("Finance"))
+                    {
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <a asp-area="Admin" asp-controller="Finance" asp-action="Donations" class="quick-action-card">
+                                <div class="qa-icon" style="background:rgba(20,184,166,0.1);color:#14b8a6;">
+                                    <i class="fas fa-hand-holding-heart"></i>
+                                </div>
+                                <span>Donations</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <a asp-area="Admin" asp-controller="Finance" asp-action="Reports" class="quick-action-card">
+                                <div class="qa-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <span>Reports</span>
+                            </a>
+                        </div>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <a asp-area="Admin" asp-controller="System" asp-action="Settings" class="quick-action-card">
+                                <div class="qa-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <span>Settings</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

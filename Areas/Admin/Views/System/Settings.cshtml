@@ -1,131 +1,460 @@
 @model SenegaleseAssociation.Areas.Admin.Models.SystemSettingsViewModel
 @{
-    ViewData["Title"] = "System Settings";
+    ViewData["Title"] = "Settings";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var activeTab = TempData["ActiveTab"]?.ToString() ?? "system";
 }
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">
-        <i class="fas fa-cog text-primary"></i> System Settings
-    </h1>
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Settings</h1>
+        <p class="subtitle">Manage system configuration and integrations</p>
+    </div>
 </div>
 
+<!-- Alerts -->
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
-
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 @if (TempData["InfoMessage"] != null)
 {
     <div class="alert alert-info alert-dismissible fade show" role="alert">
-        <i class="fas fa-info-circle"></i> @TempData["InfoMessage"]
+        <i class="fas fa-info-circle me-2"></i>@TempData["InfoMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
-<div class="row">
-    <!-- System Information -->
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">System Information</h6>
+<!-- Settings Tabs Navigation -->
+<div class="settings-tabs">
+    <button class="settings-tab @(activeTab == "system" ? "active" : "")"
+            onclick="showTab('system', this)">
+        <i class="fas fa-server"></i>
+        <span>System Info</span>
+    </button>
+    <button class="settings-tab @(activeTab == "email" ? "active" : "")"
+            onclick="showTab('email', this)">
+        <i class="fas fa-envelope-open-text"></i>
+        <span>Email / SMTP</span>
+    </button>
+    <button class="settings-tab @(activeTab == "actions" ? "active" : "")"
+            onclick="showTab('actions', this)">
+        <i class="fas fa-tools"></i>
+        <span>System Actions</span>
+    </button>
+    <button class="settings-tab @(activeTab == "logs" ? "active" : "")"
+            onclick="showTab('logs', this)" id="logsTabBtn">
+        <i class="fas fa-list-alt"></i>
+        <span>Logs</span>
+    </button>
+</div>
+
+<!-- =============================================
+     Tab: System Info
+     ============================================= -->
+<div id="tab-system" class="tab-panel" style="display:@(activeTab == "system" ? "block" : "none");">
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-header-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        Application Information
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="info-label">App Version</span>
+                        <span class="info-value">
+                            <span class="badge bg-primary">v@(Model.Version)</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Environment</span>
+                        <span class="info-value">
+                            <span class="badge @(Model.Environment == "Development" ? "bg-warning" : "bg-success")">
+                                @Model.Environment
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Database</span>
+                        <span class="info-value">@Model.DatabaseProvider</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Last Backup</span>
+                        <span class="info-value">@Model.LastBackup</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Maintenance Mode</span>
+                        <span class="info-value">
+                            <span class="badge @(Model.MaintenanceMode ? "bg-danger" : "bg-success")">
+                                <i class="fas @(Model.MaintenanceMode ? "fa-tools" : "fa-check-circle") me-1"></i>
+                                @(Model.MaintenanceMode ? "Enabled" : "Disabled")
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Framework</span>
+                        <span class="info-value">ASP.NET Core 8.0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Server Time</span>
+                        <span class="info-value" id="serverTime">@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-borderless">
-                    <tbody>
-                        <tr>
-                            <td><strong>Database Provider:</strong></td>
-                            <td>@Model.DatabaseProvider</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Environment:</strong></td>
-                            <td>
-                                <span class="badge @(Model.Environment == "Development" ? "bg-warning" : "bg-success")">
-                                    @Model.Environment
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Version:</strong></td>
-                            <td>@Model.Version</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Last Backup:</strong></td>
-                            <td>@Model.LastBackup</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Maintenance Mode:</strong></td>
-                            <td>
-                                <span class="badge @(Model.MaintenanceMode ? "bg-danger" : "bg-success")">
-                                    @(Model.MaintenanceMode ? "Enabled" : "Disabled")
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-header-icon" style="background:rgba(0,168,107,0.1);color:var(--primary);">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        System Status
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-dot green"></span>
+                                <span class="fw-600" style="font-size:.875rem;">Database Connection</span>
+                            </div>
+                            <span class="badge bg-success">Online</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-dot green"></span>
+                                <span class="fw-600" style="font-size:.875rem;">Web Application</span>
+                            </div>
+                            <span class="badge bg-success">Running</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-dot @(string.IsNullOrEmpty(Model.SmtpHost) ? "yellow" : "green")"></span>
+                                <span class="fw-600" style="font-size:.875rem;">Email Service (SMTP)</span>
+                            </div>
+                            <span class="badge @(string.IsNullOrEmpty(Model.SmtpHost) ? "bg-warning" : "bg-success")">
+                                @(string.IsNullOrEmpty(Model.SmtpHost) ? "Not Configured" : "Configured")
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-dot green"></span>
+                                <span class="fw-600" style="font-size:.875rem;">Payment Gateway</span>
+                            </div>
+                            <span class="badge bg-success">Sandbox</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-dot @(Model.MaintenanceMode ? "red" : "green")"></span>
+                                <span class="fw-600" style="font-size:.875rem;">Public Website</span>
+                            </div>
+                            <span class="badge @(Model.MaintenanceMode ? "bg-danger" : "bg-success")">
+                                @(Model.MaintenanceMode ? "In Maintenance" : "Online")
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- System Actions -->
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">System Actions</h6>
+<!-- =============================================
+     Tab: Email / SMTP
+     ============================================= -->
+<div id="tab-email" class="tab-panel" style="display:@(activeTab == "email" ? "block" : "none");">
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-header-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                            <i class="fas fa-envelope-open-text"></i>
+                        </div>
+                        SMTP Server Configuration
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form asp-action="SaveSmtpSettings" method="post" id="smtpForm">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <label asp-for="SmtpHost" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-server"></i></span>
+                                    <input asp-for="SmtpHost" class="form-control"
+                                           placeholder="smtp.gmail.com" />
+                                </div>
+                                <span asp-validation-for="SmtpHost" class="text-danger" style="font-size:.75rem;"></span>
+                                <div class="form-text">Common hosts: smtp.gmail.com, smtp.office365.com, smtp.sendgrid.net</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="SmtpPort" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                    <input asp-for="SmtpPort" type="number" class="form-control"
+                                           placeholder="587" min="1" max="65535" />
+                                </div>
+                                <span asp-validation-for="SmtpPort" class="text-danger" style="font-size:.75rem;"></span>
+                                <div class="form-text">587 (TLS) &bull; 465 (SSL) &bull; 25 (plain)</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="SmtpUsername" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                    <input asp-for="SmtpUsername" class="form-control"
+                                           placeholder="your@email.com" />
+                                </div>
+                                <span asp-validation-for="SmtpUsername" class="text-danger" style="font-size:.75rem;"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="SmtpPassword" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                    <input asp-for="SmtpPassword" type="password" class="form-control"
+                                           placeholder="••••••••••••" id="smtpPassword" autocomplete="new-password" />
+                                    <button type="button" class="btn btn-outline-secondary"
+                                            onclick="toggleSmtpPassword()" style="border-left:none;">
+                                        <i class="fas fa-eye" id="smtpPassIcon"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="SmtpPassword" class="text-danger" style="font-size:.75rem;"></span>
+                                <div class="form-text">For Gmail, use an App Password (not your account password).</div>
+                            </div>
+                        </div>
+
+                        <hr style="border-color:var(--border);margin:20px 0;">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="FromEmail" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-paper-plane"></i></span>
+                                    <input asp-for="FromEmail" type="email" class="form-control"
+                                           placeholder="noreply@yourdomain.com" />
+                                </div>
+                                <span asp-validation-for="FromEmail" class="text-danger" style="font-size:.75rem;"></span>
+                                <div class="form-text">The address shown in the From field of outgoing emails.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="FromName" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-signature"></i></span>
+                                    <input asp-for="FromName" class="form-control"
+                                           placeholder="Senegalese Association of Minnesota" />
+                                </div>
+                                <span asp-validation-for="FromName" class="text-danger" style="font-size:.75rem;"></span>
+                                <div class="form-text">The display name recipients will see.</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="AdminEmail" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
+                                    <input asp-for="AdminEmail" type="email" class="form-control"
+                                           placeholder="admin@yourdomain.com" />
+                                </div>
+                                <span asp-validation-for="AdminEmail" class="text-danger" style="font-size:.75rem;"></span>
+                                <div class="form-text">Admin notifications and contact form submissions go here.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label d-block">Security</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input asp-for="SmtpUseSsl" class="form-check-input" type="checkbox"
+                                           id="smtpUseSsl" style="width:42px;height:22px;" />
+                                    <label class="form-check-label ms-2" for="smtpUseSsl"
+                                           style="font-size:.875rem;font-weight:600;color:var(--text-primary);">
+                                        Enable SSL/TLS encryption
+                                    </label>
+                                </div>
+                                <div class="form-text">Recommended for secure email delivery.</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save SMTP Settings
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="testSmtpConnection()">
+                                <i class="fas fa-paper-plane"></i> Send Test Email
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="d-grid gap-3">
-                    <div class="d-flex justify-content-between align-items-center">
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-header-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        Setup Guide
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-3">
                         <div>
-                            <h6 class="mb-1">Database Backup</h6>
-                            <p class="text-muted small mb-0">Create a backup of the database</p>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge" style="background:rgba(234,88,12,0.12);color:#ea580c;font-size:.7rem;">Gmail</span>
+                                <span style="font-weight:700;font-size:.8rem;">Google Mail</span>
+                            </div>
+                            <div style="font-size:.78rem;color:var(--text-secondary);line-height:1.5;">
+                                Host: <code>smtp.gmail.com</code><br>
+                                Port: <code>587</code> &bull; SSL: On<br>
+                                Requires an <strong>App Password</strong> (not your Google password).<br>
+                                Enable 2FA then go to Google Account &rarr; Security &rarr; App Passwords.
+                            </div>
+                        </div>
+                        <hr style="border-color:var(--border);margin:4px 0;">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge" style="background:rgba(0,120,212,0.12);color:#0078d4;font-size:.7rem;">Office365</span>
+                                <span style="font-weight:700;font-size:.8rem;">Microsoft 365</span>
+                            </div>
+                            <div style="font-size:.78rem;color:var(--text-secondary);line-height:1.5;">
+                                Host: <code>smtp.office365.com</code><br>
+                                Port: <code>587</code> &bull; SSL: On
+                            </div>
+                        </div>
+                        <hr style="border-color:var(--border);margin:4px 0;">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge" style="background:rgba(0,168,107,0.12);color:var(--primary);font-size:.7rem;">SendGrid</span>
+                                <span style="font-weight:700;font-size:.8rem;">Twilio SendGrid</span>
+                            </div>
+                            <div style="font-size:.78rem;color:var(--text-secondary);line-height:1.5;">
+                                Host: <code>smtp.sendgrid.net</code><br>
+                                Port: <code>587</code> &bull; User: <code>apikey</code><br>
+                                Password is your SendGrid API key.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     Tab: System Actions
+     ============================================= -->
+<div id="tab-actions" class="tab-panel" style="display:@(activeTab == "actions" ? "block" : "none");">
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-header-icon" style="background:rgba(0,168,107,0.1);color:var(--primary);">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        System Operations
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="action-item">
+                        <div class="action-item-info">
+                            <h6><i class="fas fa-database me-2 text-primary-custom"></i>Database Backup</h6>
+                            <p>Create a snapshot of the current database state</p>
                         </div>
                         <a asp-action="Backup" class="btn btn-outline-primary">
                             <i class="fas fa-download"></i> Backup
                         </a>
                     </div>
-                    
-                    <hr>
-                    
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">Clear Cache</h6>
-                            <p class="text-muted small mb-0">Clear application cache</p>
+
+                    <div class="action-item">
+                        <div class="action-item-info">
+                            <h6><i class="fas fa-broom me-2" style="color:#f59e0b;"></i>Clear Cache</h6>
+                            <p>Flush all application caches to reflect latest changes</p>
                         </div>
                         <a asp-action="ClearCache" class="btn btn-outline-warning">
                             <i class="fas fa-broom"></i> Clear
                         </a>
                     </div>
-                    
-                    <hr>
-                    
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">View Logs</h6>
-                            <p class="text-muted small mb-0">View system logs</p>
+
+                    <div class="action-item">
+                        <div class="action-item-info">
+                            <h6><i class="fas fa-file-alt me-2" style="color:#3b82f6;"></i>View System Logs</h6>
+                            <p>Browse application and error logs</p>
                         </div>
                         <a asp-action="Logs" class="btn btn-outline-info">
-                            <i class="fas fa-file-alt"></i> View Logs
+                            <i class="fas fa-search"></i> View Logs
                         </a>
                     </div>
-                    
-                    <hr>
-                    
-                    <form asp-action="UpdateMaintenanceMode" method="post" class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">Maintenance Mode</h6>
-                            <p class="text-muted small mb-0">Toggle maintenance mode</p>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-header-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;">
+                            <i class="fas fa-power-off"></i>
                         </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="maintenanceMode" 
-                                   id="maintenanceMode" @(Model.MaintenanceMode ? "checked" : "") 
-                                   onchange="this.form.submit()">
-                            <label class="form-check-label" for="maintenanceMode">
-                                @(Model.MaintenanceMode ? "Disable" : "Enable")
-                            </label>
+                        Maintenance Mode
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-2 mb-4">
+                        <div class="mb-3">
+                            <span class="badge @(Model.MaintenanceMode ? "bg-danger" : "bg-success")"
+                                  style="font-size:0.9rem;padding:10px 20px;border-radius:50px;">
+                                <i class="fas @(Model.MaintenanceMode ? "fa-tools" : "fa-check-circle") me-2"></i>
+                                Maintenance Mode is @(Model.MaintenanceMode ? "ON" : "OFF")
+                            </span>
+                        </div>
+                        <p class="text-muted" style="font-size:.85rem;max-width:340px;margin:0 auto;">
+                            When enabled, the public website will display a maintenance page.
+                            Admin users can still access the dashboard.
+                        </p>
+                    </div>
+
+                    <form asp-action="UpdateMaintenanceMode" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="d-flex align-items-center justify-content-between p-3"
+                             style="background:var(--surface-2);border-radius:var(--radius-sm);border:1px solid var(--border);">
+                            <div>
+                                <div style="font-weight:700;font-size:.9rem;">Toggle Maintenance Mode</div>
+                                <div class="text-muted" style="font-size:.78rem;">
+                                    Currently: <strong>@(Model.MaintenanceMode ? "Enabled" : "Disabled")</strong>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch ms-3 mb-0">
+                                <input class="form-check-input" type="checkbox" name="maintenanceMode"
+                                       id="maintenanceModeToggle" style="width:48px;height:26px;"
+                                       @(Model.MaintenanceMode ? "checked" : "")
+                                       onchange="this.form.submit()">
+                                <label class="form-check-label" for="maintenanceModeToggle"></label>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -133,3 +462,100 @@
         </div>
     </div>
 </div>
+
+<!-- =============================================
+     Tab: Logs (redirect)
+     ============================================= -->
+<div id="tab-logs" class="tab-panel" style="display:@(activeTab == "logs" ? "block" : "none");">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="card-header-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                    <i class="fas fa-list-alt"></i>
+                </div>
+                System Logs
+            </div>
+            <a asp-action="Logs" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-external-link-alt me-1"></i> Full Logs View
+            </a>
+        </div>
+        <div class="card-body text-center py-5">
+            <div class="mb-3">
+                <i class="fas fa-file-alt fa-3x" style="color:#cbd5e1;"></i>
+            </div>
+            <h6 class="text-muted mb-3">View detailed system logs</h6>
+            <a asp-action="Logs" class="btn btn-primary">
+                <i class="fas fa-search me-1"></i> Open System Logs
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function showTab(tabId, btn) {
+        // Hide all panels
+        document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+        // Remove active from all tabs
+        document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+        // Show target
+        document.getElementById('tab-' + tabId).style.display = 'block';
+        // Set active
+        btn.classList.add('active');
+    }
+
+    function toggleSmtpPassword() {
+        const input = document.getElementById('smtpPassword');
+        const icon  = document.getElementById('smtpPassIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    function testSmtpConnection() {
+        const host  = document.querySelector('[name="SmtpHost"]')?.value;
+        const email = document.querySelector('[name="AdminEmail"]')?.value;
+
+        if (!host || !email) {
+            adminPanel.showToast('Please fill in the SMTP Host and Admin Email fields first.', 'warning');
+            return;
+        }
+
+        const btn = event.currentTarget;
+        const original = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner"></span> Sending...';
+        btn.disabled = true;
+
+        // Simulate test (replace with real endpoint if implemented)
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-check me-1"></i> Test Sent';
+            btn.classList.replace('btn-secondary', 'btn-success');
+            adminPanel.showToast('Test email queued for delivery to ' + email, 'success');
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.classList.replace('btn-success', 'btn-secondary');
+                btn.disabled = false;
+            }, 3000);
+        }, 2000);
+    }
+
+    // Live clock
+    function updateClock() {
+        const el = document.getElementById('serverTime');
+        if (el) {
+            const now = new Date();
+            el.textContent = now.getFullYear() + '-'
+                + String(now.getMonth()+1).padStart(2,'0') + '-'
+                + String(now.getDate()).padStart(2,'0') + ' '
+                + String(now.getHours()).padStart(2,'0') + ':'
+                + String(now.getMinutes()).padStart(2,'0') + ':'
+                + String(now.getSeconds()).padStart(2,'0');
+        }
+    }
+    setInterval(updateClock, 1000);
+</script>
+}

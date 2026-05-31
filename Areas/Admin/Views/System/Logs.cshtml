@@ -4,71 +4,76 @@
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">
-        <i class="fas fa-file-alt text-primary"></i> System Logs
-    </h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a asp-action="Settings" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Settings
-        </a>
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>System Logs</h1>
+        <p class="subtitle">Recent application activity and error log</p>
     </div>
+    <a asp-action="Settings" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Settings
+    </a>
 </div>
 
-<div class="card shadow">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Recent System Activity</h6>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered" id="logsTable">
-                <thead>
-                    <tr>
-                        <th>Date/Time</th>
-                        <th>Level</th>
-                        <th>Message</th>
-                        <th>User</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var log in Model)
-                    {
-                        <tr>
-                            <td>@log.Date.ToString("MM/dd/yyyy HH:mm:ss")</td>
-                            <td>
-                                @switch (log.Level)
-                                {
-                                    case "INFO":
-                                        <span class="badge bg-info">@log.Level</span>
-                                        break;
-                                    case "WARN":
-                                        <span class="badge bg-warning">@log.Level</span>
-                                        break;
-                                    case "ERROR":
-                                        <span class="badge bg-danger">@log.Level</span>
-                                        break;
-                                    default:
-                                        <span class="badge bg-secondary">@log.Level</span>
-                                        break;
-                                }
-                            </td>
-                            <td>@log.Message</td>
-                            <td>@log.User</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">
+            <div class="card-header-icon" style="background:rgba(59,130,246,0.1);color:#3b82f6;">
+                <i class="fas fa-list-alt"></i>
+            </div>
+            Recent System Activity
         </div>
+        <span class="badge bg-secondary">@Model.Count() entries</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table data-table" id="logsTable">
+            <thead>
+                <tr>
+                    <th>Date / Time</th>
+                    <th>Level</th>
+                    <th>Message</th>
+                    <th>User</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+                        <td style="white-space:nowrap;">
+                            <i class="fas fa-clock me-1" style="color:var(--text-muted);font-size:.75rem;"></i>
+                            @log.Date.ToString("MM/dd/yyyy HH:mm:ss")
+                        </td>
+                        <td>
+                            @switch (log.Level)
+                            {
+                                case "INFO":
+                                    <span class="badge bg-info">@log.Level</span>
+                                    break;
+                                case "WARN":
+                                    <span class="badge bg-warning">@log.Level</span>
+                                    break;
+                                case "ERROR":
+                                    <span class="badge bg-danger">@log.Level</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@log.Level</span>
+                                    break;
+                            }
+                        </td>
+                        <td>@log.Message</td>
+                        <td>
+                            <span style="font-size:.8rem;color:var(--text-muted);">
+                                <i class="fas fa-user me-1"></i>@log.User
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        $(document).ready(function() {
-            $('#logsTable').DataTable({
-                "order": [[ 0, "desc" ]],
-                "pageLength": 25
-            });
-        });
-    </script>
+<script>
+    // DataTable initialized by AdminPanel class via .data-table selector
+</script>
 }
